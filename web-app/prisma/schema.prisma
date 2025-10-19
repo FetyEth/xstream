@@ -54,8 +54,8 @@ model Video {
   totalWatchTime    Int      @default(0) // Total seconds watched
   
   // Creator Information
-  creatorId         String
-  creator           User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  creatorWallet   String
+  creator         User @relation(fields: [creatorWallet], references: [walletAddress], onDelete: Cascade)
   
   // Timestamps
   publishedAt       DateTime @default(now())

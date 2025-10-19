@@ -156,7 +156,6 @@ export default function UploadPage() {
       console.log("Video uploaded successfully:", data);
 
       setUploadProgress(95);
-
       // Save to your videos table
       const saveResponse = await fetch("/api/videos", {
         method: "POST",
@@ -177,7 +176,7 @@ export default function UploadPage() {
                 .map((t: string) => t.trim())
                 .filter(Boolean)
             : [],
-          creatorId: address,
+          creatorWallet: address,
         }),
       });
 

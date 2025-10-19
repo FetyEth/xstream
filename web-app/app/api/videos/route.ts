@@ -12,7 +12,7 @@ const createVideoSchema = z.object({
   pricePerSecond: z.number().min(0),
   category: z.string().optional(),
   tags: z.array(z.string()).optional(),
-  creatorId: z.string()
+  creatorWallet: z.string()
 })
 
 const getVideosSchema = z.object({
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ 
         error: 'Invalid query parameters', 
-        details: error.errors 
+        details: error.issues 
       }, { status: 400 })
     }
 
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ 
         error: 'Validation error', 
-        details: error.errors 
+        details: error.issues 
       }, { status: 400 })
     }
 

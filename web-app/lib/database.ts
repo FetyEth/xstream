@@ -89,14 +89,40 @@ export const videoService = {
     pricePerSecond: number
     category?: string
     tags?: string[]
-    creatorId: string
+    creatorWallet: string
   }) {
+    // First, ensure the user exists
+    await prisma.user.upsert({
+      where: { walletAddress: data.creatorWallet },
+      update: {}, // Don't update anything if exists
+      create: {
+        walletAddress: data.creatorWallet,
+        // Optional: Set default username
+        username: `user_${data.creatorWallet.slice(0, 8)}`,
+      },
+    });
+
+    // Now create the video - connect to existing user via relation
     return await prisma.video.create({
       data: {
-        ...data,
-        pricePerSecond: data.pricePerSecond.toString()
-      }
-    })
+        title: data.title,
+        description: data.description,
+        videoUrl: data.videoUrl,
+        thumbnailUrl: data.thumbnailUrl,
+        duration: data.duration,
+        pricePerSecond: data.pricePerSecond.toString(),
+        category: data.category,
+        tags: data.tags || [],
+        creator: {
+          connect: {
+            walletAddress: data.creatorWallet,
+          },
+        },
+      },
+      include: {
+        creator: true, // Include creator info in response
+      },
+    });
   },
 
   // Get videos with filters
