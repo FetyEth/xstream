@@ -75,7 +75,7 @@ async function main() {
         totalViews: 1250,
         totalWatchTime: 450000,
         totalEarnings: 4500,
-        creatorId: users[0].id
+        creatorWallet: users[0].walletAddress
       }
     }),
     prisma.video.create({
@@ -91,7 +91,7 @@ async function main() {
         totalViews: 890,
         totalWatchTime: 320000,
         totalEarnings: 2560,
-        creatorId: users[1].id
+        creatorWallet: users[1].walletAddress
       }
     }),
     prisma.video.create({
@@ -107,7 +107,7 @@ async function main() {
         totalViews: 2340,
         totalWatchTime: 580000,
         totalEarnings: 2900,
-        creatorId: users[2].id
+        creatorWallet: users[2].walletAddress
       }
     }),
     prisma.video.create({
@@ -123,7 +123,7 @@ async function main() {
         totalViews: 1560,
         totalWatchTime: 420000,
         totalEarnings: 5040,
-        creatorId: users[3].id
+        creatorWallet: users[3].walletAddress
       }
     }),
     prisma.video.create({
@@ -139,7 +139,7 @@ async function main() {
         totalViews: 3200,
         totalWatchTime: 640000,
         totalEarnings: 1920,
-        creatorId: users[0].id
+        creatorWallet: users[0].walletAddress
       }
     }),
     prisma.video.create({
@@ -155,7 +155,7 @@ async function main() {
         totalViews: 4500,
         totalWatchTime: 890000,
         totalEarnings: 6230,
-        creatorId: users[1].id
+        creatorWallet: users[1].walletAddress
       }
     }),
     prisma.video.create({
@@ -171,7 +171,7 @@ async function main() {
         totalViews: 780,
         totalWatchTime: 290000,
         totalEarnings: 4350,
-        creatorId: users[2].id
+        creatorWallet: users[2].walletAddress
       }
     }),
     prisma.video.create({
@@ -187,7 +187,7 @@ async function main() {
         totalViews: 1890,
         totalWatchTime: 450000,
         totalEarnings: 4050,
-        creatorId: users[3].id
+        creatorWallet: users[3].walletAddress
       }
     })
   ])
