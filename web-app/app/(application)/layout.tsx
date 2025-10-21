@@ -1,9 +1,9 @@
 "use client";
 
-import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
-import MainContent from "../components/MainContent";
-import { SidebarProvider } from "../components/SidebarContext";
+import Header from "../../components/Header";
+import Sidebar from "../../components/Sidebar";
+import MainContent from "../../components/MainContent";
+import { SidebarProvider } from "../../components/SidebarContext";
 
 export default function RootLayout({
   children,
@@ -12,7 +12,7 @@ export default function RootLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="bg-gray-900 text-white min-h-screen">
+      <div className="bg-gradient-to-b from-neutral-950 via-neutral-900 to-black text-white min-h-screen">
         <Sidebar />
         <Header />
         <MainContent>{children}</MainContent>

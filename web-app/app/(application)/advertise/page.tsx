@@ -87,20 +87,17 @@ export default function AdvertisePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-black/20 backdrop-blur-lg">
-      <div className="mt-2 bg-gradient-to-r from-blue-600 to-cyan-600 border-b border-blue-500/50">
+    <div className="min-h-screen">
+      <div className="mt-2 bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl border-b border-white/10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Image src='/logo.png' alt='xStream Logo' width={36} height={36} />
               <div>
-                <h2 className="text-white font-base text-lg">Creator Studio - Advertising</h2>
-                <p className="text-gray-300 font-light text-xs">Reach your audience with targeted ads</p>
+                <h2 className="text-white font-light text-lg">Creator Studio - Advertising</h2>
+                <p className="text-white/50 font-light text-xs">Reach your audience with targeted ads</p>
               </div>
             </div>
-            <Badge className="bg-white/10 text-white border-white/20 hidden sm:flex">
-              Creator Tool
-            </Badge>
           </div>
         </div>
       </div>
@@ -108,22 +105,22 @@ export default function AdvertisePage() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
           <div className="flex flex-col items-start gap-3 mb-4">
-            <h1 className="text-4xl font-medium text-white">Advertise on xStream</h1>
-            <p className="text-gray-300 text-sm font-light">Create campaigns, track performance, and grow your reach</p>
+            <h1 className="text-4xl font-light text-white">Advertise on xStream</h1>
+            <p className="text-white/70 text-sm font-light">Create campaigns, track performance, and grow your reach</p>
           </div>
         </div>
 
         <Tabs defaultValue="create" className="mb-8 text-sm font-light">
-          <TabsList className="bg-white/5 border border-white/10">
-            <TabsTrigger value="create" className="flex items-center gap-2 text-gray-300 hover:text-white data-[state=active]:bg-white/15 data-[state=active]:text-white data-[state=active]:border">
+          <TabsList>
+            <TabsTrigger value="create" className="flex items-center gap-2">
               <Upload className="w-4 h-4" />
               Create Ad
             </TabsTrigger>
-            <TabsTrigger value="campaigns" className="flex items-center gap-2 text-gray-300 hover:text-white data-[state=active]:bg-white/15 data-[state=active]:text-white data-[state=active]:border">
+            <TabsTrigger value="campaigns" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
               My Campaigns
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2 text-gray-300 hover:text-white data-[state=active]:bg-white/15 data-[state=active]:text-white data-[state=active]:border">
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
               Analytics
             </TabsTrigger>
@@ -134,19 +131,19 @@ export default function AdvertisePage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Ad Creation Form */}
               <div className="space-y-6">
-                <Card className="bg-slate-950 backdrop-blur border-white/10">
+                <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-white">
+                    <CardTitle className="flex items-center gap-2 text-white font-light">
                       <Upload className="h-5 w-5" />
                       <span>Create New Ad</span>
                     </CardTitle>
-                    <CardDescription className="text-gray-400">
+                    <CardDescription className="text-white/70 font-light">
                       Upload your ad and set targeting preferences
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <label className="block text-sm font-light text-gray-300 mb-2">Ad Title</label>
+                      <label className="block text-sm font-light text-white mb-2">Ad Title</label>
                       <Input
                         placeholder="Enter ad title"
                         value={adTitle}
@@ -155,7 +152,7 @@ export default function AdvertisePage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-light text-gray-300 mb-2">Description</label>
+                      <label className="block text-sm font-light text-white mb-2">Description</label>
                       <Textarea
                         placeholder="Describe your ad"
                         value={adDescription}
@@ -165,24 +162,24 @@ export default function AdvertisePage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-light text-gray-300 mb-2">Ad Video</label>
-                      <div className="border-2 border-dashed border-white/10 rounded-md p-6 text-center bg-white/5">
-                        <PlayCircle className="h-12 w-12 mx-auto mb-2 text-gray-400" />
-                        <p className="text-sm text-gray-400 mb-2">
+                      <label className="block text-sm font-light text-white mb-2">Ad Video</label>
+                      <div className="border-2 border-dashed border-white/10 rounded-md p-6 text-center bg-white/[0.02] backdrop-blur-xl">
+                        <PlayCircle className="h-12 w-12 mx-auto mb-2 text-white/50" />
+                        <p className="text-sm text-white/70 mb-2 font-light">
                           Upload your ad video
                         </p>
-                        <Button variant="outline" size="sm" className="border-white/20 text-gray-200">
+                        <Button variant="outline" size="sm">
                           <Upload className="h-4 w-4 mr-2" />
                           Choose File
                         </Button>
-                        <p className="text-xs text-gray-500 mt-2">
+                        <p className="text-xs text-white/50 mt-2 font-light">
                           Max duration: 60 seconds | Formats: MP4, MOV
                         </p>
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-light text-gray-300 mb-2">Ad Duration</label>
+                      <label className="block text-sm font-light text-white mb-2">Ad Duration</label>
                       <Select value={adDuration} onValueChange={setAdDuration}>
                         <SelectTrigger>
                           <SelectValue />
@@ -200,41 +197,41 @@ export default function AdvertisePage() {
 
               {/* Ad Preview & Pricing */}
               <div className="space-y-6">
-                <Card className="bg-slate-950 backdrop-blur border-white/10">
+                <Card>
                   <CardHeader>
-                    <CardTitle className="text-white">Pricing Model</CardTitle>
-                    <CardDescription className="text-gray-400">
+                    <CardTitle className="text-white font-light">Pricing Model</CardTitle>
+                    <CardDescription className="text-white/70 font-light">
                       xStream's unique ad pricing system
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      <div className="p-4 bg-white/5 rounded-md border border-white/10">
+                      <div className="p-4 bg-white/[0.02] rounded-md border border-white/10 backdrop-blur-xl">
                         <div className="flex items-center gap-2 mb-2">
-                          <Zap className="h-4 w-4 text-slate-200" />
-                          <span className="font-base text-white">Pay-Per-View Model</span>
+                          <Zap className="h-4 w-4 text-white/70" />
+                          <span className="font-light text-white">Pay-Per-View Model</span>
                         </div>
-                        <p className="text-xs font-light text-gray-400">
+                        <p className="text-xs font-light text-white/70">
                           You only pay when viewers actually watch your ad, not for impressions
                         </p>
                       </div>
 
-                      <div className="p-4 bg-white/5 rounded-md border border-white/10">
+                      <div className="p-4 bg-white/[0.02] rounded-md border border-white/10 backdrop-blur-xl">
                         <div className="flex items-center gap-2 mb-2">
-                          <DollarSign className="h-4 w-4 text-slate-200" />
-                          <span className="font-base text-white">Skip Revenue Share</span>
+                          <DollarSign className="h-4 w-4 text-white/70" />
+                          <span className="font-light text-white">Skip Revenue Share</span>
                         </div>
-                        <p className="text-xs font-light text-gray-400">
+                        <p className="text-xs font-light text-white/70">
                           When viewers skip ads, they pay via x402 - creators and you both earn
                         </p>
                       </div>
 
-                      <div className="p-4 bg-white/5 rounded-md border border-white/10">
+                      <div className="p-4 bg-white/[0.02] rounded-md border border-white/10 backdrop-blur-xl">
                         <div className="flex items-center gap-2 mb-2">
-                          <Target className="h-4 w-4 text-slate-200" />
-                          <span className="base text-white">Quality Targeting</span>
+                          <Target className="h-4 w-4 text-white/70" />
+                          <span className="font-light text-white">Quality Targeting</span>
                         </div>
-                        <p className="text-xs font-light text-gray-400">
+                        <p className="text-xs font-light text-white/70">
                           Target viewers by video quality preference and engagement patterns
                         </p>
                       </div>
@@ -242,16 +239,16 @@ export default function AdvertisePage() {
                   </CardContent>
                 </Card>
 
-                                <Card className="bg-slate-950 backdrop-blur border-white/10">
+                <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-white">
+                    <CardTitle className="flex items-center gap-2 text-white font-light">
                       <Target className="h-5 w-5" />
                       <span>Targeting</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <label className="block text-sm font-light text-gray-300 mb-2">Target Video</label>
+                      <label className="block text-sm font-light text-white mb-2">Target Video</label>
                       <Select value={targetVideo} onValueChange={setTargetVideo}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a video to show your ad on" />
@@ -263,13 +260,13 @@ export default function AdvertisePage() {
                           <SelectItem value="any">Any video (platform choice)</SelectItem>
                         </SelectContent>
                       </Select>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-white/50 mt-1 font-light">
                         Choose specific videos or let xStream optimize placement
                       </p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-light text-gray-300 mb-2">Budget (USD)</label>
+                      <label className="block text-sm font-light text-white mb-2">Budget (USD)</label>
                       <Input
                         type="number"
                         placeholder="50.00"
@@ -278,7 +275,7 @@ export default function AdvertisePage() {
                         min="10"
                         step="1"
                       />
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-white/50 mt-1 font-light">
                         Minimum budget: $10 | You pay only when viewers watch your ad
                       </p>
                     </div>
@@ -289,26 +286,26 @@ export default function AdvertisePage() {
 
             {/* Cost Estimate Card - always at bottom */}
             <div className="mt-6">
-              <Card className="bg-slate-950 backdrop-blur border-white/10">
+              <Card>
                 <CardHeader>
-                  <CardTitle className="text-white">Cost Estimate</CardTitle>
+                  <CardTitle className="text-white font-light">Cost Estimate</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Base cost per view:</span>
-                      <span className="font-medium text-white">$0.02</span>
+                      <span className="text-white/70 font-light">Base cost per view:</span>
+                      <span className="font-light text-white">$0.02</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Estimated views with ${adBudget || '0'} budget:</span>
-                      <span className="font-medium text-white">{adBudget ? Math.floor(parseFloat(adBudget) / 0.02) : 0}</span>
+                      <span className="text-white/70 font-light">Estimated views with ${adBudget || '0'} budget:</span>
+                      <span className="font-light text-white">{adBudget ? Math.floor(parseFloat(adBudget) / 0.02) : 0}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Platform fee (10%):</span>
-                      <span className="font-medium text-white">${adBudget ? (parseFloat(adBudget) * 0.1).toFixed(2) : '0.00'}</span>
+                      <span className="text-white/70 font-light">Platform fee (10%):</span>
+                      <span className="font-light text-white">${adBudget ? (parseFloat(adBudget) * 0.1).toFixed(2) : '0.00'}</span>
                     </div>
-                    <div className="border-t pt-2">
-                      <div className="flex justify-between font-medium text-white">
+                    <div className="border-t border-white/10 pt-2">
+                      <div className="flex justify-between font-light text-white">
                         <span>Total budget needed:</span>
                         <span>${adBudget ? (parseFloat(adBudget) * 1.1).toFixed(2) : '0.00'}</span>
                       </div>
@@ -327,21 +324,21 @@ export default function AdvertisePage() {
           <TabsContent value="campaigns" className="mt-8 space-y-6">
             <div className="space-y-4">
               {adCampaigns.map((campaign) => (
-                <Card key={campaign.id} className="bg-slate-950 backdrop-blur border-white/10">
+                <Card key={campaign.id}>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <div className="w-16 h-12 bg-gray-800 rounded flex items-center justify-center">
-                          <PlayCircle className="h-6 w-6 text-gray-400" />
+                        <div className="w-16 h-12 bg-white/10 rounded flex items-center justify-center backdrop-blur-xl">
+                          <PlayCircle className="h-6 w-6 text-white/50" />
                         </div>
                         <div>
-                          <h4 className="font-medium text-white">{campaign.title}</h4>
-                          <p className="text-sm text-gray-400">Target: {campaign.targetVideo}</p>
+                          <h4 className="font-light text-white">{campaign.title}</h4>
+                          <p className="text-sm text-white/70 font-light">Target: {campaign.targetVideo}</p>
                           <div className="flex items-center space-x-4 mt-1">
                             <Badge variant={campaign.status === 'active' ? 'default' : 'secondary'}>
                               {campaign.status}
                             </Badge>
-                            <span className="text-xs text-gray-400">
+                            <span className="text-xs text-white/70 font-light">
                               {campaign.views.toLocaleString()} views
                             </span>
                           </div>
@@ -349,18 +346,18 @@ export default function AdvertisePage() {
                       </div>
                       
                       <div className="text-right">
-                        <p className="text-lg font-semibold text-white">
+                        <p className="text-lg font-light text-white">
                           ${campaign.spent.toFixed(2)} / ${campaign.budget.toFixed(2)}
                         </p>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm text-white/70 font-light">
                           {campaign.skips} skips ({((campaign.skips / campaign.views) * 100).toFixed(1)}%)
                         </p>
                         <div className="flex space-x-2 mt-2">
-                          <Button size="sm" variant="outline" className="border-white/20 text-gray-200">
+                          <Button size="sm" variant="outline">
                             <Settings className="h-3 w-3 mr-1" />
                             Edit
                           </Button>
-                          <Button size="sm" variant="outline" className="border-white/20 text-gray-200">
+                          <Button size="sm" variant="outline">
                             <BarChart3 className="h-3 w-3 mr-1" />
                             Stats
                           </Button>
@@ -378,17 +375,17 @@ export default function AdvertisePage() {
             {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {adStats.map((stat, index) => (
-                <Card key={index} className="bg-slate-950 backdrop-blur border-white/10">
+                <Card key={index}>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-light text-gray-400">
+                        <p className="text-sm font-light text-white/70">
                           {stat.title}
                         </p>
-                        <p className="text-2xl font-medium text-white">{stat.value}</p>
-                        <p className={`text-sm font-medium ${stat.color.replace('600', '400')}`}>{stat.change} this week</p>
+                        <p className="text-2xl font-light text-white">{stat.value}</p>
+                        <p className="text-sm font-light text-white/70">{stat.change} this week</p>
                       </div>
-                      <stat.icon className={`h-8 w-8 ${stat.color.replace('600', '400')}`} />
+                      <stat.icon className="h-8 w-8 text-white/50" />
                     </div>
                   </CardContent>
                 </Card>
@@ -398,45 +395,45 @@ export default function AdvertisePage() {
             {/* Performance Insights */}
             <Card>
               <CardHeader>
-                <CardTitle>Performance Insights</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-white font-light">Performance Insights</CardTitle>
+                <CardDescription className="text-white/70 font-light">
                   Key metrics and recommendations for your ad campaigns
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="p-4 bg-white/10 rounded-md">
+                  <div className="p-4 bg-white/[0.02] rounded-md backdrop-blur-xl border border-white/10">
                     <div className="flex items-center space-x-2 mb-2">
-                      <TrendingUp className="h-4 w-4 text-gray-300" />
-                      <span className="font-base text-gray-300">
+                      <TrendingUp className="h-4 w-4 text-white/70" />
+                      <span className="font-light text-white">
                         High Engagement
                       </span>
                     </div>
-                    <p className="text-sm text-gray-300">
+                    <p className="text-sm text-white/70 font-light">
                       Your "Base Blockchain Tutorial" ad has 85% completion rate - consider increasing budget
                     </p>
                   </div>
 
-                  <div className="p-4 bg-white/10 rounded-md">
+                  <div className="p-4 bg-white/[0.02] rounded-md backdrop-blur-xl border border-white/10">
                     <div className="flex items-center space-x-2 mb-2">
-                      <Eye className="h-4 w-4 text-gray-300" />
-                      <span className="font-base text-gray-300">
+                      <Eye className="h-4 w-4 text-white/70" />
+                      <span className="font-light text-white">
                         Peak Hours
                       </span>
                     </div>
-                    <p className="text-sm text-gray-300">
+                    <p className="text-sm text-white/70 font-light">
                       Best performance between 7-9 PM on weekdays - optimize your scheduling
                     </p>
                   </div>
 
-                  <div className="p-4 bg-white/10 rounded-md">
+                  <div className="p-4 bg-white/[0.02] rounded-md backdrop-blur-xl border border-white/10">
                     <div className="flex items-center space-x-2 mb-2">
-                      <Users className="h-4 w-4 text-gray-300" />
-                      <span className="font-base text-gray-300">
+                      <Users className="h-4 w-4 text-white/70" />
+                      <span className="font-light text-white">
                         Audience Preference
                       </span>
                     </div>
-                    <p className="text-sm text-gray-300">
+                    <p className="text-sm text-white/70 font-light">
                       Viewers prefer 30-second ads over 60-second ones - 23% better completion rate
                     </p>
                   </div>

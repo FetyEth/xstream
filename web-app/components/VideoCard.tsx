@@ -46,19 +46,6 @@ export default function VideoCard({ video }: VideoCardProps) {
     return (price * totalSeconds).toFixed(2);
   };
 
-  const getQualityColor = (quality: string) => {
-    switch (quality) {
-      case '4K':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
-      case '1080p':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-      case '720p':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
-    }
-  };
-
   const thumbnailUrl = video.thumbnailUrl || video.thumbnail || '';
   const viewCount = video.totalViews ?? video.views ?? 0;
   const uploadDate = video.publishedAt 
@@ -73,37 +60,37 @@ export default function VideoCard({ video }: VideoCardProps) {
     : (video.creator?.displayName?.slice(0, 2).toUpperCase() || '??');
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200 group">
+    <Card className="group">
       <div className="relative">
         {/* Thumbnail */}
-        <div className="relative aspect-video bg-gray-200 dark:bg-gray-700 overflow-hidden">
+        <div className="relative aspect-video bg-white/[0.02] overflow-hidden">
           <img
             src={thumbnailUrl}
             alt={video.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             onError={(e) => {
               e.currentTarget.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMyMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iMTgwIiBmaWxsPSIjZjNmNGY2Ii8+CjxwYXRoIGQ9Ik0xNDUgNzBjMCA1LjUyMyA0LjQ3NyAxMCAxMCAxMHMxMC00LjQ3NyAxMC0xMC00LjQ3Ny0xMC0xMC0xMC0xMCA0LjQ3Ny0xMCAxMHoiIGZpbGw9IiM5Y2EzYWYiLz4KPHN2ZyBjbGFzcz0idzYgaDYgdGV4dC1ncmF5LTQwMCIgZmlsbD0iY3VycmVudENvbG9yIiB2aWV3Qm94PSIwIDAgMjAgMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgZD0iTTQgM2ExIDEgMCAwMC0xIDF2MTJhMSAxIDAgMDAxIDFoMTJhMSAxIDAgMDAxLTFWNGExIDEgMCAwMC0xLTFINHptNSA4YTMgMyAwIDAwMy0zVjZhNSA1IDAgMTAtNSA1eiIgY2xpcC1ydWxlPSJldmVub2RkIj48L3BhdGg+Cjwvc3ZnPgo8L3N2Zz4=";
             }}
           />
           
-          <div className="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
+          <div className="absolute bottom-2 right-2 bg-black/75 backdrop-blur-sm text-white text-xs px-2 py-1 rounded font-light">
             {durationDisplay}
           </div>
           
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black bg-opacity-50">
-            <Button size="lg" className="rounded-full">
-              <Play className="h-6 w-6 ml-1" />
-            </Button>
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black/50 backdrop-blur-sm">
+            <div className="bg-white text-black rounded-full p-4 transform scale-75 group-hover:scale-100 transition-transform duration-300">
+              <Play className="h-6 w-6" fill="currentColor" />
+            </div>
           </div>
         </div>
 
         {video.maxQuality && (
-          <Badge className={`absolute top-2 left-2 ${getQualityColor(video.maxQuality)}`}>
+          <Badge className="absolute top-2 left-2 bg-white/10 backdrop-blur-md border-white/20 text-white font-light">
             {video.maxQuality}
           </Badge>
         )}
 
-        <Badge variant="secondary" className="absolute top-2 right-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+        <Badge variant="secondary" className="absolute top-2 right-2 bg-white/10 backdrop-blur-md border-white/20 text-white font-light">
           <DollarSign className="h-3 w-3 mr-1" />
           ${calculateTotalPrice(video.pricePerSecond, video.duration)}
         </Badge>
@@ -117,24 +104,24 @@ export default function VideoCard({ video }: VideoCardProps) {
               <AvatarFallback>{creatorInitials}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+              <p className="text-sm font-light text-white/70 truncate">
                 {creatorName}
               </p>
             </div>
           </div>
 
           <Link href={`/watch/${video.id}`}>
-            <h3 className="font-semibold text-gray-900 dark:text-gray-100 line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer">
+            <h3 className="font-light text-white line-clamp-2 hover:text-white/70 cursor-pointer transition-colors duration-300">
               {video.title}
             </h3>
           </Link>
 
           {video.description && (
-            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+            <p className="text-sm text-white/50 line-clamp-2 font-light">
               {video.description}
             </p>
           )}
-          <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+          <div className="flex items-center justify-between text-sm text-white/50 font-light">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-1">
                 <Eye className="h-4 w-4" />
@@ -145,16 +132,16 @@ export default function VideoCard({ video }: VideoCardProps) {
           </div>
 
           {/* Pricing info */}
-          <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex items-center space-x-2 text-sm">
-              <Zap className="h-4 w-4 text-yellow-500" />
-              <span className="text-gray-600 dark:text-gray-400">
+          <div className="flex items-center justify-between pt-2 border-t border-white/5">
+            <div className="flex items-center space-x-2 text-sm font-light">
+              <Zap className="h-4 w-4 text-white/70" />
+              <span className="text-white/50">
                 ${video.pricePerSecond}/sec
               </span>
             </div>
             
             <Link href={`/watch/${video.id}`}>
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+              <Button size="sm">
                 <Play className="h-4 w-4 mr-2" />
                 Watch
               </Button>

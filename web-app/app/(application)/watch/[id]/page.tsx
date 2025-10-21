@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Loading } from "@/components/ui/loading";
 import { Name } from "@coinbase/onchainkit/identity";
 import { 
   ThumbsUp, 
@@ -18,11 +19,10 @@ import {
   DollarSign,
   Zap,
   Award,
-  Users,
-  Loader2
+  Users
 } from "lucide-react";
-import VideoPlayer from "@/app/components/VideoPlayer";
-import VideoCard from "@/app/components/VideoCard";
+import VideoPlayer from "@/components/VideoPlayer";
+import VideoCard from "@/components/VideoCard";
 
 export default function WatchPage() {
   const params = useParams();
@@ -66,17 +66,17 @@ export default function WatchPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black/20 backdrop-blur-lg flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center">
+        <Loading text="Loading video..." size="lg" />
       </div>
     );
   }
 
   if (error || !video) {
     return (
-      <div className="min-h-screen bg-black/20 backdrop-blur-lg flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-white mb-4">{error || 'Video not found'}</p>
+          <p className="text-xl text-white font-light mb-4">{error || 'Video not found'}</p>
           <Button onClick={() => window.location.href = '/browse'}>
             Back to Browse
           </Button>
@@ -86,7 +86,7 @@ export default function WatchPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black/20 backdrop-blur-lg p-4">
+    <div className="min-h-screen p-4">
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
@@ -95,15 +95,15 @@ export default function WatchPage() {
             <VideoPlayer video={video} />
 
             {/* Video Info */}
-            <Card className="bg-slate-950 backdrop-blur border-white/10">
+            <Card>
               <CardContent className="p-6">
                 <div className="space-y-4">
                   {/* Title and Stats */}
                   <div>
-                    <h1 className="text-2xl font-medium text-white mb-2">
+                    <h1 className="text-2xl font-light text-white mb-2">
                       {video.title}
                     </h1>
-                    <div className="flex items-center space-x-4 text-sm text-gray-400">
+                    <div className="flex items-center space-x-4 text-sm text-white/50 font-light">
                       <div className="flex items-center space-x-1">
                         <Eye className="h-4 w-4" />
                         <span>{video.totalViews?.toLocaleString() || 0} views</span>
@@ -129,10 +129,10 @@ export default function WatchPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <h3 className="font-semibold text-white">
+                        <h3 className="font-light text-white">
                           <Name address={video.creator?.walletAddress as `0x${string}`} />
                         </h3>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm text-white/50 font-light">
                           {video.creator?.walletAddress?.slice(0, 6)}...{video.creator?.walletAddress?.slice(-4)}
                         </p>
                       </div>
@@ -142,22 +142,22 @@ export default function WatchPage() {
                     </div>
 
                     <div className="flex items-center space-x-2">
-                      <div className="flex items-center bg-white/5 rounded-full">
+                      <div className="flex items-center bg-white/[0.02] border border-white/10 rounded-full">
                         <Button variant="ghost" size="sm" className="rounded-l-full">
                           <ThumbsUp className="h-4 w-4 mr-1" />
                           0
                         </Button>
-                        <div className="w-px h-6 bg-gray-600" />
+                        <div className="w-px h-6 bg-white/10" />
                         <Button variant="ghost" size="sm" className="rounded-r-full">
                           <ThumbsDown className="h-4 w-4 mr-1" />
                           0
                         </Button>
                       </div>
-                      <Button variant="outline" size="sm" className="border-white/20 text-gray-200">
+                      <Button variant="outline" size="sm">
                         <Share className="h-4 w-4 mr-1" />
                         Share
                       </Button>
-                      <Button variant="outline" size="sm" className="border-white/20 text-gray-200">
+                      <Button variant="outline" size="sm">
                         <Download className="h-4 w-4 mr-1" />
                         Download
                       </Button>
@@ -168,34 +168,34 @@ export default function WatchPage() {
                   </div>
 
                   {/* xStream Features */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-white/5 rounded-md border border-white/10">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-white/[0.02] rounded-md border border-white/10">
                     <div className="flex items-center space-x-2">
-                      <Zap className="h-5 w-5 text-blue-400" />
+                      <Zap className="h-5 w-5 text-white/70" />
                       <div>
-                        <p className="text-sm font-medium text-white">Pay per Second</p>
-                        <p className="text-xs text-blue-400">Only pay for what you watch</p>
+                        <p className="text-sm font-light text-white">Pay per Second</p>
+                        <p className="text-xs text-white/50 font-light">Only pay for what you watch</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <DollarSign className="h-5 w-5 text-green-400" />
+                      <DollarSign className="h-5 w-5 text-white/70" />
                       <div>
-                        <p className="text-sm font-medium text-white">Direct to Creator</p>
-                        <p className="text-xs text-green-400">${parseFloat(video.totalEarnings || '0').toFixed(2)} earned</p>
+                        <p className="text-sm font-light text-white">Direct to Creator</p>
+                        <p className="text-xs text-white/50 font-light">${parseFloat(video.totalEarnings || '0').toFixed(2)} earned</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Award className="h-5 w-5 text-purple-400" />
+                      <Award className="h-5 w-5 text-white/70" />
                       <div>
-                        <p className="text-sm font-medium text-white">Earn NFT Rewards</p>
-                        <p className="text-xs text-purple-400">Watch to unlock rewards</p>
+                        <p className="text-sm font-light text-white">Earn NFT Rewards</p>
+                        <p className="text-xs text-white/50 font-light">Watch to unlock rewards</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Description */}
                   <div className="space-y-2">
-                    <h4 className="font-medium text-white">Description</h4>
-                    <p className="text-gray-400 leading-relaxed">
+                    <h4 className="font-light text-white">Description</h4>
+                    <p className="text-white/50 font-light leading-relaxed">
                       {video.description || 'No description available'}
                     </p>
                     {/* Tags */}
@@ -214,10 +214,10 @@ export default function WatchPage() {
             </Card>
 
             {/* Comments Section */}
-            <Card className="bg-slate-950 backdrop-blur border-white/10">
+            <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Comments</h3>
-                <div className="text-center py-8 text-gray-400">
+                <h3 className="text-lg font-light text-white mb-4">Comments</h3>
+                <div className="text-center py-8 text-white/50 font-light">
                   <Users className="h-12 w-12 mx-auto mb-2 opacity-50" />
                   <p>Comments coming soon...</p>
                   <p className="text-sm">Connect your wallet to leave a comment</p>
@@ -228,7 +228,7 @@ export default function WatchPage() {
 
           {/* Sidebar - Suggested Videos */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-light text-white">
               Up Next
             </h3>
             <div className="space-y-4">

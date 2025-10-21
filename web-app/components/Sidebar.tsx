@@ -41,17 +41,19 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className={`${isCollapsed ? 'w-20' : 'w-64'} fixed left-0 top-[73px] bottom-0 bg-black/20 backdrop-blur-lg border-r border-gray-200 dark:border-gray-700 hidden md:block transition-all duration-300 z-40`}>
+    <div className={`${isCollapsed ? 'w-20' : 'w-64'} fixed left-0 top-[73px] bottom-0 bg-black/40 backdrop-blur-xl border-r border-white/5 hidden md:block transition-all duration-300 z-40`}>
       {/* Toggle Button */}
       <Button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-6 z-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        variant="ghost"
+        size="sm"
+        className="absolute -right-3 top-6 z-10 bg-black/60 backdrop-blur-lg border border-white/10 rounded-full p-1 hover:bg-white/10 transition-all duration-300"
         aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         {isCollapsed ? (
-          <ChevronRight className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+          <ChevronRight className="h-4 w-4 text-white/70" />
         ) : (
-          <ChevronLeft className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+          <ChevronLeft className="h-4 w-4 text-white/70" />
         )}
       </Button>
 
@@ -66,7 +68,7 @@ export default function Sidebar() {
                 <Button
                   key={item.label}
                   variant="ghost"
-                  className={`w-full ${isCollapsed ? 'justify-center px-2' : 'justify-start'} text-gray-300 hover:text-white hover:bg-white/10 ${isActive ? 'bg-white/20 text-white' : ''}`}
+                  className={`w-full ${isCollapsed ? 'justify-center px-2' : 'justify-start'} font-light ${isActive ? 'bg-white text-black' : 'text-white/70 hover:text-white hover:bg-white/5'} transition-all duration-300`}
                   title={isCollapsed ? item.label : undefined}
                   asChild
                 >
@@ -80,12 +82,12 @@ export default function Sidebar() {
           </nav>
         </div>
 
-        <hr className="border-gray-200 dark:border-gray-700" />
+        <hr className="border-white/5" />
 
         {/* Library Section */}
         <div>
           {!isCollapsed && (
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3 px-3">
+            <h3 className="text-xs font-light text-white/50 mb-3 px-3 uppercase tracking-wider">
               Library
             </h3>
           )}
@@ -96,7 +98,7 @@ export default function Sidebar() {
                 <Button
                   key={item.label}
                   variant="ghost"
-                  className={`w-full ${isCollapsed ? 'justify-center px-2' : 'justify-start'} text-gray-300 hover:text-white hover:bg-white/10 ${isActive ? 'bg-white/20 text-white' : ''}`}
+                  className={`w-full ${isCollapsed ? 'justify-center px-2' : 'justify-start'} font-light ${isActive ? 'bg-white text-black' : 'text-white/70 hover:text-white hover:bg-white/5'} transition-all duration-300`}
                   title={isCollapsed ? item.label : undefined}
                   asChild
                 >
@@ -110,12 +112,12 @@ export default function Sidebar() {
           </nav>
         </div>
 
-        <hr className="border-gray-200 dark:border-gray-700" />
+        <hr className="border-white/5" />
 
         {/* Creator Tools */}
         <div>
           {!isCollapsed && (
-            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3 px-3">
+            <h3 className="text-xs font-light text-white/50 mb-3 px-3 uppercase tracking-wider">
               Creator Tools
             </h3>
           )}
@@ -126,7 +128,7 @@ export default function Sidebar() {
                 <Button
                   key={item.label}
                   variant="ghost"
-                  className={`w-full ${isCollapsed ? 'justify-center px-2' : 'justify-start'} text-gray-300 hover:text-white hover:bg-white/10 ${isActive ? 'bg-white/20 text-white' : ''}`}
+                  className={`w-full ${isCollapsed ? 'justify-center px-2' : 'justify-start'} font-light ${isActive ? 'bg-white text-black' : 'text-white/70 hover:text-white hover:bg-white/5'} transition-all duration-300`}
                   title={isCollapsed ? item.label : undefined}
                   asChild
                 >
@@ -142,7 +144,7 @@ export default function Sidebar() {
 
         {/* Footer */}
         {!isCollapsed && (
-          <div className="absolute bottom-4 left-4 text-xs text-gray-500 dark:text-gray-400">
+          <div className="absolute bottom-4 left-4 text-xs text-white/40 font-light">
             <p>© 2025 xStream</p>
             <p>Powered by x402 & Base</p>
           </div>

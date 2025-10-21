@@ -147,11 +147,11 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
           />
           
           {/* Player Controls Overlay */}
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/75 to-transparent p-4">
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent backdrop-blur-sm p-4">
             {/* Progress Bar */}
             <div 
               ref={progressBarRef}
-              className="w-full h-1 bg-white/30 rounded-full mb-4 cursor-pointer"
+              className="w-full h-1 bg-white/20 rounded-full mb-4 cursor-pointer group/progress"
               onClick={(e) => {
                 if (videoRef.current && progressBarRef.current) {
                   const rect = progressBarRef.current.getBoundingClientRect();
@@ -162,7 +162,7 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
               }}
             >
               <div 
-                className="h-full bg-blue-600 rounded-full"
+                className="h-full bg-white rounded-full transition-all duration-300 group-hover/progress:h-1.5"
                 style={{ 
                   width: videoRef.current ? `${(currentTime / videoRef.current.duration) * 100}%` : '0%' 
                 }}
@@ -176,7 +176,7 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
                   variant="ghost"
                   size="sm"
                   onClick={togglePlayPause}
-                  className="text-white hover:text-blue-400"
+                  className="text-white hover:text-white hover:bg-white/10 font-light"
                 >
                   {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
                 </Button>
@@ -186,7 +186,7 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
                     variant="ghost"
                     size="sm"
                     onClick={() => setIsMuted(!isMuted)}
-                    className="text-white hover:text-blue-400"
+                    className="text-white hover:text-white hover:bg-white/10 font-light"
                   >
                     {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
                   </Button>
@@ -197,11 +197,11 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
                     step="0.1"
                     value={isMuted ? 0 : volume}
                     onChange={(e) => setVolume(parseFloat(e.target.value))}
-                    className="w-20"
+                    className="w-20 accent-white"
                   />
                 </div>
 
-                <span className="text-sm">
+                <span className="text-sm font-light">
                   {formatTime(currentTime)} / {video.duration}
                 </span>
               </div>
@@ -209,7 +209,7 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
               <div className="flex items-center space-x-4">
                 {/* Quality Selector */}
                 <Select value={quality} onValueChange={setQuality}>
-                  <SelectTrigger className="w-24 h-8 bg-black/50 border-white/30 text-white">
+                  <SelectTrigger className="w-24 h-8 bg-white/10 backdrop-blur-md border-white/20 text-white font-light">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -224,7 +224,7 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-white hover:text-blue-400"
+                  className="text-white hover:text-white hover:bg-white/10 font-light"
                 >
                   <Maximize className="h-5 w-5" />
                 </Button>
@@ -234,12 +234,12 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
 
           {/* Stake Required Overlay */}
           {!isStaked && (
-            <div className="absolute inset-0 bg-black/75 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/75 backdrop-blur-md flex items-center justify-center">
               <Card className="max-w-md w-full mx-4">
                 <CardContent className="p-6 text-center">
-                  <Wallet className="h-12 w-12 mx-auto mb-4 text-blue-600" />
-                  <h3 className="text-lg font-semibold mb-2">Stake to Watch</h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  <Wallet className="h-12 w-12 mx-auto mb-4 text-white" />
+                  <h3 className="text-lg font-light mb-2 text-white">Stake to Watch</h3>
+                  <p className="text-white/50 mb-4 font-light">
                     Stake funds to start watching. You'll only be charged for what you actually watch.
                   </p>
                   <Button onClick={() => setShowStakeDialog(true)} className="w-full">
@@ -259,23 +259,23 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                <Badge variant="secondary" className="bg-white/10 border-white/20 text-white font-light">
                   <CheckCircle className="h-4 w-4 mr-1" />
                   Staked
                 </Badge>
-                <div className="text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">Current spend: </span>
-                  <span className="font-semibold">${currentSpent.toFixed(4)}</span>
+                <div className="text-sm font-light">
+                  <span className="text-white/50">Current spend: </span>
+                  <span className="text-white">${currentSpent.toFixed(4)}</span>
                 </div>
-                <div className="text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">Rate: </span>
-                  <span className="font-semibold">${getCurrentPricePerSecond().toFixed(4)}/sec</span>
+                <div className="text-sm font-light">
+                  <span className="text-white/50">Rate: </span>
+                  <span className="text-white">${getCurrentPricePerSecond().toFixed(4)}/sec</span>
                 </div>
               </div>
               
               <div className="flex items-center space-x-2">
-                <Zap className="h-4 w-4 text-yellow-500" />
-                <span className="text-sm font-medium">Quality: {quality}</span>
+                <Zap className="h-4 w-4 text-white/70" />
+                <span className="text-sm font-light text-white">Quality: {quality}</span>
               </div>
             </div>
           </CardContent>
@@ -286,25 +286,25 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
       <Dialog open={showStakeDialog} onOpenChange={setShowStakeDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Stake Funds to Watch</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="font-light">Stake Funds to Watch</DialogTitle>
+            <DialogDescription className="font-light">
               Stake the maximum amount you're willing to spend. You'll only be charged for the time you actually watch.
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4">
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <div className="p-4 bg-white/[0.02] backdrop-blur-sm border border-white/10 rounded-lg">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">Recommended Stake:</span>
-                <span className="text-lg font-bold text-blue-600">${calculateTotalCost()}</span>
+                <span className="text-sm font-light text-white/70">Recommended Stake:</span>
+                <span className="text-lg font-light text-white">${calculateTotalCost()}</span>
               </div>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
+              <p className="text-xs text-white/50 font-light">
                 For full video at {quality} quality
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Stake Amount (USD)</label>
+              <label className="block text-sm font-light mb-2 text-white/70">Stake Amount (USD)</label>
               <Input
                 type="number"
                 placeholder="0.00"
@@ -315,10 +315,10 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
               />
             </div>
 
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              • Minimum stake: ${calculateTotalCost()}<br/>
-              • Unused funds will be automatically refunded<br/>
-              • Charges are calculated per second watched
+            <div className="text-xs text-white/50 font-light space-y-1">
+              <p>• Minimum stake: ${calculateTotalCost()}</p>
+              <p>• Unused funds will be automatically refunded</p>
+              <p>• Charges are calculated per second watched</p>
             </div>
           </div>
 
@@ -338,18 +338,18 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
       <Dialog open={showPaymentConfirm} onOpenChange={setShowPaymentConfirm}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Payment</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="font-light">Confirm Payment</DialogTitle>
+            <DialogDescription className="font-light">
               Starting playback will begin charging ${getCurrentPricePerSecond().toFixed(4)} per second.
             </DialogDescription>
           </DialogHeader>
           
-          <div className="p-4 border rounded-lg">
+          <div className="p-4 border border-white/10 bg-white/[0.02] backdrop-blur-sm rounded-lg">
             <div className="flex items-center space-x-2 mb-2">
-              <AlertCircle className="h-4 w-4 text-amber-500" />
-              <span className="font-medium">Payment Authorization</span>
+              <AlertCircle className="h-4 w-4 text-white/70" />
+              <span className="font-light text-white">Payment Authorization</span>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-white/50 font-light">
               This video will charge you based on your watch time and selected quality.
             </p>
           </div>

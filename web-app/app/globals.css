@@ -2,58 +2,58 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 220.9 39.3% 11%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 2%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 3%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 0 0% 10%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 224 71.4% 4.1%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 0 0% 80%;
     --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --chart-1: 0 0% 80%;
+    --chart-2: 0 0% 60%;
+    --chart-3: 0 0% 40%;
+    --chart-4: 0 0% 20%;
+    --chart-5: 0 0% 10%;
   }
 
   .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 210 20% 98%;
-    --primary-foreground: 220.9 39.3% 11%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 216 12.2% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 2%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 3%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 0 0% 10%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 0 0% 80%;
+    --chart-1: 0 0% 80%;
+    --chart-2: 0 0% 60%;
+    --chart-3: 0 0% 40%;
+    --chart-4: 0 0% 20%;
+    --chart-5: 0 0% 10%;
   }
 
   * {
@@ -61,7 +61,7 @@
   }
 
   body {
-    @apply bg-white text-black dark:bg-gray-900 dark:text-white;
+    @apply bg-black text-white antialiased font-light;
   }
 }
 
@@ -96,6 +96,24 @@
       opacity: 0.5;
     }
   }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
 }
 
 @utility animate-fade-in {
@@ -114,7 +132,7 @@
   .video-player {
     position: relative;
     background: #000;
-    border-radius: 8px;
+    border-radius: 0.5rem;
     overflow: hidden;
   }
 
@@ -123,8 +141,8 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-    padding: 20px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+    padding: 1.5rem;
     opacity: 0;
     transition: opacity 0.3s ease;
   }
@@ -134,29 +152,29 @@
   }
 
   .payment-modal {
-    backdrop-filter: blur(8px);
-    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(12px);
+    background: rgba(0, 0, 0, 0.6);
   }
 
   .card-hover {
-    transition: all 0.2s ease;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .card-hover:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   }
 
   .progress-bar {
     height: 4px;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 2px;
     overflow: hidden;
   }
 
   .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    background: linear-gradient(90deg, #ffffff, #a3a3a3);
     transition: width 0.3s ease;
   }
 
@@ -165,6 +183,7 @@
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
   }
 
   .wallet-container {
@@ -174,15 +193,32 @@
   }
 
   .text-xstream {
-    color: #3b82f6;
+    color: #ffffff;
   }
 
   .bg-xstream {
-    background-color: #3b82f6;
+    background-color: rgba(255, 255, 255, 0.05);
   }
 
   .border-xstream {
-    border-color: #3b82f6;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
   }
 
   /* Hide OnchainKit notification overlay - all possible selectors */
@@ -203,81 +239,83 @@
     pointer-events: none !important;
   }
 }
-/* OnchainKit Custom Theme - Blue Theme to match xStream */
+/* OnchainKit Custom Theme - Elegant Neutral Theme */
 :root {
-  --ock-bg-default: #0f172a;
-  --ock-bg-default-hover: rgba(59, 130, 246, 0.1);
-  --ock-bg-default-active: rgba(59, 130, 246, 0.2);
-  --ock-bg-alternate: rgba(15, 23, 42, 0.95);
-  --ock-bg-alternate-hover: rgba(30, 58, 138, 0.3);
-  --ock-bg-alternate-active: rgba(30, 58, 138, 0.5);
+  --ock-bg-default: #000000;
+  --ock-bg-default-hover: rgba(255, 255, 255, 0.05);
+  --ock-bg-default-active: rgba(255, 255, 255, 0.1);
+  --ock-bg-alternate: rgba(0, 0, 0, 0.95);
+  --ock-bg-alternate-hover: rgba(255, 255, 255, 0.08);
+  --ock-bg-alternate-active: rgba(255, 255, 255, 0.12);
   --ock-bg-inverse: #ffffff;
-  --ock-bg-primary: #3b82f6;
-  --ock-bg-primary-hover: #2563eb;
-  --ock-bg-primary-active: #1d4ed8;
-  --ock-bg-secondary: rgba(59, 130, 246, 0.1);
-  --ock-bg-secondary-hover: rgba(59, 130, 246, 0.2);
-  --ock-bg-secondary-active: rgba(59, 130, 246, 0.3);
+  --ock-bg-primary: #ffffff;
+  --ock-bg-primary-hover: #e5e5e5;
+  --ock-bg-primary-active: #d4d4d4;
+  --ock-bg-secondary: rgba(255, 255, 255, 0.05);
+  --ock-bg-secondary-hover: rgba(255, 255, 255, 0.1);
+  --ock-bg-secondary-active: rgba(255, 255, 255, 0.15);
   --ock-text-default: #ffffff;
   --ock-text-foreground: #ffffff;
-  --ock-text-foreground-muted: rgba(255, 255, 255, 0.7);
-  --ock-text-inverse: #0f172a;
-  --ock-text-primary: #3b82f6;
-  --ock-text-secondary: rgba(255, 255, 255, 0.6);
+  --ock-text-foreground-muted: rgba(255, 255, 255, 0.6);
+  --ock-text-inverse: #000000;
+  --ock-text-primary: #ffffff;
+  --ock-text-secondary: rgba(255, 255, 255, 0.5);
   --ock-text-error: #ef4444;
   --ock-text-success: #22c55e;
-  --ock-border-default: rgba(59, 130, 246, 0.2);
-  --ock-border-active: #3b82f6;
+  --ock-border-default: rgba(255, 255, 255, 0.1);
+  --ock-border-active: rgba(255, 255, 255, 0.2);
 }
 
 /* OnchainKit Component Overrides */
 .ock-wallet-button {
-  background: linear-gradient(to right, #3b82f6, #2563eb) !important;
-  color: white !important;
-  border-radius: 0.75rem !important;
-  padding: 0.5rem 1rem !important;
-  font-weight: 500 !important;
-  border: 1px solid rgba(59, 130, 246, 0.3) !important;
-  transition: all 0.2s ease !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 1.25rem !important;
+  font-weight: 300 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.3s ease !important;
+  font-size: 0.875rem !important;
 }
 
 .ock-wallet-button:hover {
-  background: linear-gradient(to right, #2563eb, #1d4ed8) !important;
-  border-color: rgba(59, 130, 246, 0.5) !important;
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3) !important;
+  background: #e5e5e5 !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1) !important;
 }
 
 .ock-wallet-dropdown {
-  background: rgba(15, 23, 42, 0.98) !important;
-  backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(59, 130, 246, 0.2) !important;
-  border-radius: 1rem !important;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+  background: rgba(0, 0, 0, 0.98) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8) !important;
 }
 
 .ock-wallet-dropdown-link:hover,
 .ock-wallet-dropdown-disconnect:hover {
-  background: rgba(59, 130, 246, 0.1) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
 }
 
 .ock-identity {
-  border-bottom: 1px solid rgba(59, 130, 246, 0.1) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
 .ock-avatar {
-  border: 2px solid #3b82f6 !important;
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
 }
 
 .ock-text-name {
-  color: #3b82f6 !important;
-  font-weight: 600 !important;
+  color: #ffffff !important;
+  font-weight: 300 !important;
 }
 
 .ock-text-address {
-  color: rgba(255, 255, 255, 0.6) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-weight: 300 !important;
 }
 
 .ock-text-balance {
-  color: #22c55e !important;
-  font-weight: 500 !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-weight: 300 !important;
 }

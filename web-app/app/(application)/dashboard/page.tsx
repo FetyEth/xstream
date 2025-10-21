@@ -79,51 +79,39 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-black/20 backdrop-blur-lg p-4">
+    <div className="min-h-screen p-4">
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex flex-col items-start gap-3 mb-4">
-            <h1 className="text-4xl font-medium text-white">
+            <h1 className="text-4xl font-light text-white">
               {isConnected && address ? (
-                <> Welcome back, <Name address={address} className="text-slate-200" /> </>
+                <> Welcome back, <Name address={address} className="text-white/70" /> </>
               ) : (
                 <>Dashboard</>
               )}
             </h1>
-            <p className="text-gray-300 text-sm font-light">Track your xStream activity and earnings</p>
+            <p className="text-white/50 text-sm font-light">Track your xStream activity and earnings</p>
           </div>
         </div>
 
-        {/* Tabs - matching Trending styling */}
-        <Tabs defaultValue="overview" className="mb-8 text-sm font-light">
-          <TabsList className="bg-white/5 border border-white/10">
-            <TabsTrigger
-              value="overview"
-              className="flex items-center gap-2 text-gray-300 hover:text-white data-[state=active]:bg-white/15 data-[state=active]:text-white data-[state=active]:border"
-            >
-              <TrendingUp className="w-4 h-4" />
+        {/* Tabs */}
+        <Tabs defaultValue="overview" className="mb-8">
+          <TabsList>
+            <TabsTrigger value="overview">
+              <TrendingUp className="w-4 h-4 mr-2" />
               Overview
             </TabsTrigger>
-            <TabsTrigger
-              value="creator"
-              className="flex items-center gap-2 text-gray-300 hover:text-white data-[state=active]:bg-white/15 data-[state=active]:text-white data-[state=active]:border"
-            >
-              <Video className="w-4 h-4" />
+            <TabsTrigger value="creator">
+              <Video className="w-4 h-4 mr-2" />
               Creator Analytics
             </TabsTrigger>
-            <TabsTrigger
-              value="viewer"
-              className="flex items-center gap-2 text-gray-300 hover:text-white data-[state=active]:bg-white/15 data-[state=active]:text-white data-[state=active]:border"
-            >
-              <Eye className="w-4 h-4" />
+            <TabsTrigger value="viewer">
+              <Eye className="w-4 h-4 mr-2" />
               Viewer Stats
             </TabsTrigger>
-            <TabsTrigger
-              value="nfts"
-              className="flex items-center gap-2 text-gray-300 hover:text-white data-[state=active]:bg-white/15 data-[state=active]:text-white data-[state=active]:border"
-            >
-              <Award className="w-4 h-4" />
+            <TabsTrigger value="nfts">
+              <Award className="w-4 h-4 mr-2" />
               NFT Collection
             </TabsTrigger>
           </TabsList>
@@ -133,96 +121,92 @@ export default function DashboardPage() {
             <div className="space-y-6">
               {/* Key Metrics */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="bg-slate-950 backdrop-blur border-white/10">
+                <Card>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-light text-gray-400">Total Earned</p>
-                        <p className="text-2xl font-medium text-slate-200">${creatorStats.totalEarned}</p>
+                        <p className="text-sm font-light text-white/50">Total Earned</p>
+                        <p className="text-2xl font-light text-white">${creatorStats.totalEarned}</p>
                       </div>
-                      <DollarSign className="h-8 w-8 text-slate-200" />
+                      <DollarSign className="h-8 w-8 text-white/70" />
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-slate-950 backdrop-blur border-white/10">
+                <Card>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-light text-gray-400">Total Spent</p>
-                        <p className="text-2xl font-medium text-slate-200">${userStats.totalSpent}</p>
+                        <p className="text-sm font-light text-white/50">Total Spent</p>
+                        <p className="text-2xl font-light text-white">${userStats.totalSpent}</p>
                       </div>
-                      <Wallet className="h-8 w-8 text-slate-200" />
+                      <Wallet className="h-8 w-8 text-white/70" />
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-slate-950 backdrop-blur border-white/10">
+                <Card>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-light text-gray-400">Watch Time</p>
-                        <p className="text-2xl font-medium text-slate-200">
+                        <p className="text-sm font-light text-white/50">Watch Time</p>
+                        <p className="text-2xl font-light text-white">
                           {Math.floor(userStats.totalWatchTime / 60)}h {userStats.totalWatchTime % 60}m
                         </p>
                       </div>
-                      <Clock className="h-8 w-8 text-slate-200" />
+                      <Clock className="h-8 w-8 text-white/70" />
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-slate-950 backdrop-blur border-white/10">
+                <Card>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-light text-gray-400">NFTs Earned</p>
-                        <p className="text-2xl font-medium text-slate-200">{userStats.nftsEarned}</p>
+                        <p className="text-sm font-light text-white/50">NFTs Earned</p>
+                        <p className="text-2xl font-light text-white">{userStats.nftsEarned}</p>
                       </div>
-                      <Award className="h-8 w-8 text-slate-200" />
+                      <Award className="h-8 w-8 text-white/70" />
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
               {/* Recent Activity */}
-              <Card className="bg-slate-950 backdrop-blur border-white/10">
+              <Card>
                 <CardHeader>
-                  <CardTitle className="text-white">Recent Activity</CardTitle>
-                  <CardDescription className="text-gray-400">Your latest transactions and activities</CardDescription>
+                  <CardTitle className="font-light">Recent Activity</CardTitle>
+                  <CardDescription className="font-light">Your latest transactions and activities</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {recentActivity.map((activity, index) => (
-                      <div key={index} className="flex items-center justify-between py-2">
-                        <div className="flex items-center space-x-3">
-                          <div
-                            className={`w-2 h-2 rounded-full ${
-                              activity.type === "earn"
-                                ? "bg-green-500"
-                                : activity.type === "watch"
-                                ? "bg-blue-500"
-                                : "bg-yellow-500"
-                            }`}
-                          />
-                          <div>
-                            <p className="text-sm font-light text-white">{activity.description}</p>
-                            <p className="text-xs text-gray-500">{activity.time}</p>
+                    {recentActivity.length === 0 ? (
+                      <p className="text-sm text-white/50 font-light text-center py-8">No recent activity</p>
+                    ) : (
+                      recentActivity.map((activity, index) => (
+                        <div key={index} className="flex items-center justify-between py-2">
+                          <div className="flex items-center space-x-3">
+                            <div
+                              className={`w-2 h-2 rounded-full ${
+                                activity.type === "earn"
+                                  ? "bg-white/70"
+                                  : activity.type === "watch"
+                                  ? "bg-white/50"
+                                  : "bg-white/30"
+                              }`}
+                            />
+                            <div>
+                              <p className="text-sm font-light text-white">{activity.description}</p>
+                              <p className="text-xs text-white/40 font-light">{activity.time}</p>
+                            </div>
+                          </div>
+                          <div className="text-sm font-light text-white">
+                            {activity.amount !== 0 && (activity.amount > 0 ? "+" : "")}
+                            {activity.amount !== 0 ? `$${Math.abs(activity.amount).toFixed(2)}` : ""}
                           </div>
                         </div>
-                        <div
-                          className={`text-sm font-medium ${
-                            activity.amount > 0
-                              ? "text-slate-200"
-                              : activity.amount < 0
-                              ? "text-red-400"
-                              : "text-gray-400"
-                          }`}
-                        >
-                          {activity.amount !== 0 && (activity.amount > 0 ? "+" : "")}
-                          {activity.amount !== 0 ? `$${Math.abs(activity.amount).toFixed(2)}` : ""}
-                        </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -234,93 +218,97 @@ export default function DashboardPage() {
             <div className="space-y-6">
               {/* Creator Stats */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="bg-slate-950 backdrop-blur border-white/10">
+                <Card>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-light text-gray-400">Total Views</p>
-                        <p className="text-2xl font-medium text-slate-200">{creatorStats.totalViews.toLocaleString()}</p>
+                        <p className="text-sm font-light text-white/50">Total Views</p>
+                        <p className="text-2xl font-light text-white">{creatorStats.totalViews.toLocaleString()}</p>
                       </div>
-                      <Eye className="h-8 w-8 text-slate-200" />
+                      <Eye className="h-8 w-8 text-white/70" />
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-slate-950 backdrop-blur border-white/10">
+                <Card>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-light text-gray-400">Subscribers</p>
-                        <p className="text-2xl font-medium text-slate-200">{creatorStats.subscribers}</p>
+                        <p className="text-sm font-light text-white/50">Subscribers</p>
+                        <p className="text-2xl font-light text-white">{creatorStats.subscribers}</p>
                       </div>
-                      <Users className="h-8 w-8 text-slate-200" />
+                      <Users className="h-8 w-8 text-white/70" />
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-slate-950 backdrop-blur border-white/10">
+                <Card>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-light text-gray-400">Videos Published</p>
-                        <p className="text-2xl font-medium text-slate-200">{creatorStats.totalVideos}</p>
+                        <p className="text-sm font-light text-white/50">Videos Published</p>
+                        <p className="text-2xl font-light text-white">{creatorStats.totalVideos}</p>
                       </div>
-                      <Video className="h-8 w-8 text-slate-200" />
+                      <Video className="h-8 w-8 text-white/70" />
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-slate-950 backdrop-blur border-white/10">
+                <Card>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-light text-gray-400">Avg Watch Time</p>
-                        <p className="text-2xl font-medium text-slate-200">{creatorStats.avgViewDuration}m</p>
+                        <p className="text-sm font-light text-white/50">Avg Watch Time</p>
+                        <p className="text-2xl font-light text-white">{creatorStats.avgViewDuration}m</p>
                       </div>
-                      <Clock className="h-8 w-8 text-slate-200" />
+                      <Clock className="h-8 w-8 text-white/70" />
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
               {/* Video Performance */}
-              <Card className="bg-slate-950 backdrop-blur border-white/10">
+              <Card>
                 <CardHeader>
-                  <CardTitle className="text-white">Video Performance</CardTitle>
-                  <CardDescription className="text-gray-400">Your recent videos and their performance</CardDescription>
+                  <CardTitle className="font-light">Video Performance</CardTitle>
+                  <CardDescription className="font-light">Your recent videos and their performance</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {recentVideos.map((video) => (
-                      <div key={video.id} className="flex items-center justify-between p-4 border border-white/10 rounded-md bg-white/5">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-16 h-12 bg-gray-800 rounded flex items-center justify-center">
-                            <PlayCircle className="h-6 w-6 text-gray-400" />
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-white">{video.title}</h4>
-                            <div className="flex items-center space-x-4 text-sm text-gray-400">
-                              <span className="flex items-center">
-                                <Eye className="h-3 w-3 mr-1" />
-                                {video.views.toLocaleString()}
-                              </span>
-                              <span className="flex items-center">
-                                <Clock className="h-3 w-3 mr-1" />
-                                {video.duration}
-                              </span>
-                              <span className="flex items-center">
-                                <Calendar className="h-3 w-3 mr-1" />
-                                {video.uploadDate}
-                              </span>
+                    {recentVideos.length === 0 ? (
+                      <p className="text-sm text-white/50 font-light text-center py-8">No videos yet</p>
+                    ) : (
+                      recentVideos.map((video) => (
+                        <div key={video.id} className="flex items-center justify-between p-4 border border-white/10 rounded-md bg-white/[0.02] hover:bg-white/[0.04] transition-colors duration-300">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-16 h-12 bg-white/[0.02] rounded flex items-center justify-center">
+                              <PlayCircle className="h-6 w-6 text-white/50" />
+                            </div>
+                            <div>
+                              <h4 className="font-light text-white">{video.title}</h4>
+                              <div className="flex items-center space-x-4 text-sm text-white/50 font-light">
+                                <span className="flex items-center">
+                                  <Eye className="h-3 w-3 mr-1" />
+                                  {video.views.toLocaleString()}
+                                </span>
+                                <span className="flex items-center">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  {video.duration}
+                                </span>
+                                <span className="flex items-center">
+                                  <Calendar className="h-3 w-3 mr-1" />
+                                  {video.uploadDate}
+                                </span>
+                              </div>
                             </div>
                           </div>
+                          <div className="text-right">
+                            <p className="text-lg font-light text-white">${video.earned}</p>
+                            <p className="text-sm text-white/50 font-light">earned</p>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-lg font-semibold text-slate-200">${video.earned}</p>
-                          <p className="text-sm text-gray-400">earned</p>
-                        </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -332,68 +320,68 @@ export default function DashboardPage() {
             <div className="space-y-6">
               {/* Viewer Stats */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="bg-slate-950 backdrop-blur border-white/10">
+                <Card>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-light text-gray-400">Videos Watched</p>
-                        <p className="text-2xl font-medium text-slate-200">{userStats.videosWatched}</p>
+                        <p className="text-sm font-light text-white/50">Videos Watched</p>
+                        <p className="text-2xl font-light text-white">{userStats.videosWatched}</p>
                       </div>
-                      <Video className="h-8 w-8 text-slate-200" />
+                      <Video className="h-8 w-8 text-white/70" />
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-slate-950 backdrop-blur border-white/10">
+                <Card>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-light text-gray-400">Favorite Creators</p>
-                        <p className="text-2xl font-medium text-slate-200">{userStats.favoriteCreators}</p>
+                        <p className="text-sm font-light text-white/50">Favorite Creators</p>
+                        <p className="text-2xl font-light text-white">{userStats.favoriteCreators}</p>
                       </div>
-                      <Star className="h-8 w-8 text-slate-200" />
+                      <Star className="h-8 w-8 text-white/70" />
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="bg-slate-950 backdrop-blur border-white/10">
+                <Card>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-light text-gray-400">Avg Cost/Min</p>
-                        <p className="text-2xl font-medium text-slate-200">
+                        <p className="text-sm font-light text-white/50">Avg Cost/Min</p>
+                        <p className="text-2xl font-light text-white">
                           {userStats.totalWatchTime > 0
                             ? (userStats.totalSpent / userStats.totalWatchTime).toFixed(3)
                             : "0.000"}
                         </p>
                       </div>
-                      <Zap className="h-8 w-8 text-slate-200" />
+                      <Zap className="h-8 w-8 text-white/70" />
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
               {/* Spending Breakdown */}
-              <Card className="bg-slate-950 backdrop-blur border-white/10">
+              <Card>
                 <CardHeader>
-                  <CardTitle className="text-white">Spending Insights</CardTitle>
-                  <CardDescription className="text-gray-400">How you're using xStream</CardDescription>
+                  <CardTitle className="font-light">Spending Insights</CardTitle>
+                  <CardDescription className="font-light">How you're using xStream</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="p-4 bg-white/5 rounded-md border border-white/10">
-                      <h4 className="font-medium text-white mb-2">Most Watched Quality</h4>
-                      <p className="text-sm text-gray-400">1080p (78% of watch time) - You prefer high quality content</p>
+                    <div className="p-4 bg-white/[0.02] rounded-md border border-white/10">
+                      <h4 className="font-light text-white mb-2">Most Watched Quality</h4>
+                      <p className="text-sm text-white/50 font-light">1080p (78% of watch time) - You prefer high quality content</p>
                     </div>
 
-                    <div className="p-4 bg-white/5 rounded-md border border-white/10">
-                      <h4 className="font-medium text-white mb-2">Savings vs Traditional</h4>
-                      <p className="text-sm text-gray-400">You've saved ~$15.67 compared to traditional subscriptions</p>
+                    <div className="p-4 bg-white/[0.02] rounded-md border border-white/10">
+                      <h4 className="font-light text-white mb-2">Savings vs Traditional</h4>
+                      <p className="text-sm text-white/50 font-light">You've saved ~$15.67 compared to traditional subscriptions</p>
                     </div>
 
-                    <div className="p-4 bg-white/5 rounded-md border border-white/10">
-                      <h4 className="font-medium text-white mb-2">Peak Watching Time</h4>
-                      <p className="text-sm text-gray-400">7-9 PM weekdays - Perfect for evening learning sessions</p>
+                    <div className="p-4 bg-white/[0.02] rounded-md border border-white/10">
+                      <h4 className="font-light text-white mb-2">Peak Watching Time</h4>
+                      <p className="text-sm text-white/50 font-light">7-9 PM weekdays - Perfect for evening learning sessions</p>
                     </div>
                   </div>
                 </CardContent>
@@ -404,26 +392,26 @@ export default function DashboardPage() {
           {/* NFT Collection Tab */}
           <TabsContent value="nfts" className="mt-8">
             <div className="space-y-6">
-              <Card className="bg-slate-950 backdrop-blur border-white/10">
+              <Card>
                 <CardHeader>
-                  <CardTitle className="text-white">NFT Collection</CardTitle>
-                  <CardDescription className="text-gray-400">Milestone NFTs earned through your xStream activity</CardDescription>
+                  <CardTitle className="font-light">NFT Collection</CardTitle>
+                  <CardDescription className="font-light">Milestone NFTs earned through your xStream activity</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {nftMilestones.map((nft, index) => (
                       <div
                         key={index}
-                        className={`p-4 border rounded-md ${
+                        className={`p-4 border rounded-md transition-all duration-300 ${
                           nft.earned
-                            ? "bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/30"
-                            : "bg-white/5 border-white/10"
+                            ? "bg-white/[0.05] border-white/20 hover:bg-white/[0.08]"
+                            : "bg-white/[0.02] border-white/10 hover:bg-white/[0.04]"
                         }`}
                       >
                         <div className="text-center">
                           <div className="text-4xl mb-2">{nft.earned ? nft.icon : "🔒"}</div>
-                          <h4 className="font-medium mb-1 text-white">{nft.name}</h4>
-                          <p className="text-xs text-gray-400">{nft.description}</p>
+                          <h4 className="font-light mb-1 text-white">{nft.name}</h4>
+                          <p className="text-xs text-white/50 font-light">{nft.description}</p>
                           {nft.earned && (
                             <Badge variant="secondary" className="mt-2">Earned</Badge>
                           )}
@@ -435,35 +423,35 @@ export default function DashboardPage() {
               </Card>
 
               {/* NFT Benefits */}
-              <Card className="bg-slate-950 backdrop-blur border-white/10">
+              <Card>
                 <CardHeader>
-                  <CardTitle className="text-white">NFT Benefits</CardTitle>
-                  <CardDescription className="text-gray-400">Unlock rewards and perks with your NFT collection</CardDescription>
+                  <CardTitle className="font-light">NFT Benefits</CardTitle>
+                  <CardDescription className="font-light">Unlock rewards and perks with your NFT collection</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-md border border-white/10">
+                    <div className="flex items-center justify-between p-3 bg-white/[0.02] rounded-md border border-white/10 hover:bg-white/[0.04] transition-colors duration-300">
                       <div>
-                        <h4 className="font-medium text-white">Early Access</h4>
-                        <p className="text-sm text-gray-400">Get early access to new creator content</p>
+                        <h4 className="font-light text-white">Early Access</h4>
+                        <p className="text-sm text-white/50 font-light">Get early access to new creator content</p>
                       </div>
-                      <Badge variant="secondary" className="bg-green-500/20 text-green-300">Active</Badge>
+                      <Badge variant="secondary" className="bg-white/10 border-white/20 text-white">Active</Badge>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-md border border-white/10">
+                    <div className="flex items-center justify-between p-3 bg-white/[0.02] rounded-md border border-white/10 hover:bg-white/[0.04] transition-colors duration-300">
                       <div>
-                        <h4 className="font-medium text-white">Exclusive Discounts</h4>
-                        <p className="text-sm text-gray-400">10% off premium content (Requires 5 NFTs)</p>
+                        <h4 className="font-light text-white">Exclusive Discounts</h4>
+                        <p className="text-sm text-white/50 font-light">10% off premium content (Requires 5 NFTs)</p>
                       </div>
-                      <Badge variant="outline" className="border-white/20 text-gray-300">Locked</Badge>
+                      <Badge variant="outline">Locked</Badge>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-md border border-white/10">
+                    <div className="flex items-center justify-between p-3 bg-white/[0.02] rounded-md border border-white/10 hover:bg-white/[0.04] transition-colors duration-300">
                       <div>
-                        <h4 className="font-medium text-white">Creator Chat Access</h4>
-                        <p className="text-sm text-gray-400">Direct chat with your favorite creators (Requires 10 NFTs)</p>
+                        <h4 className="font-light text-white">Creator Chat Access</h4>
+                        <p className="text-sm text-white/50 font-light">Direct chat with your favorite creators (Requires 10 NFTs)</p>
                       </div>
-                      <Badge variant="outline" className="border-white/20 text-gray-300">Locked</Badge>
+                      <Badge variant="outline">Locked</Badge>
                     </div>
                   </div>
                 </CardContent>
