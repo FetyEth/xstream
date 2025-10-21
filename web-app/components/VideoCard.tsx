@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Play, Clock, Eye, DollarSign, Zap, Star } from "lucide-react";
+import { Play, Eye, DollarSign, Zap } from "lucide-react";
 import Link from "next/link";
 import { formatDuration, formatRelativeTime, formatCreatorName } from "@/lib/video-utils";
 

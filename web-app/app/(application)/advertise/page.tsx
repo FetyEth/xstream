@@ -17,8 +17,6 @@ import {
   Upload,
   Settings,
   BarChart3,
-  Calendar,
-  Clock,
   Users,
   Zap
 } from "lucide-react";
@@ -201,7 +199,7 @@ export default function AdvertisePage() {
                   <CardHeader>
                     <CardTitle className="text-white font-light">Pricing Model</CardTitle>
                     <CardDescription className="text-white/70 font-light">
-                      xStream's unique ad pricing system
+                      xStream&apos;s unique ad pricing system
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -410,7 +408,7 @@ export default function AdvertisePage() {
                       </span>
                     </div>
                     <p className="text-sm text-white/70 font-light">
-                      Your "Base Blockchain Tutorial" ad has 85% completion rate - consider increasing budget
+                      Your &quot;Base Blockchain Tutorial&quot; ad has 85% completion rate - consider increasing budget
                     </p>
                   </div>
 

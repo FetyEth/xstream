@@ -114,7 +114,7 @@ async function createAdaptiveBitrate(
   }
 
   // Create master playlist
-  const masterPlaylist = qualities.map((q, i) => 
+  const masterPlaylist = qualities.map((q) => 
     `#EXT-X-STREAM-INF:BANDWIDTH=${parseInt(q.bitrate) * 1000},RESOLUTION=${q.width}x${q.height}\n${q.name}/playlist.m3u8`
   ).join('\n');
 

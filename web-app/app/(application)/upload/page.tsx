@@ -15,7 +15,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loading } from "@/components/ui/loading";
 import {
   Select,
   SelectContent,
@@ -25,15 +24,10 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import {
-  Upload,
-  Play,
-  Clock,
-  Users,
   Eye,
   Zap,
   AlertCircle,
   CheckCircle,
-  Target,
   X,
   RotateCw,
   Video,
@@ -593,11 +587,12 @@ export default function UploadPage() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {getQualityOptions()
                       .filter(
-                        (q) =>
-                          q.multiplier <=
-                          getQualityOptions().find(
+                        (q) => {
+                          const selectedOption = getQualityOptions().find(
                             (opt) => opt.value === maxQuality
-                          )?.multiplier!
+                          );
+                          return selectedOption ? q.multiplier <= selectedOption.multiplier : false;
+                        }
                       )
                       .map((option) => (
                         <div
@@ -761,7 +756,7 @@ export default function UploadPage() {
                     By publishing, you agree to:
                   </p>
                   <ul className="list-disc list-inside space-y-1 ml-2">
-                    <li>xStream's Terms of Service and Creator Guidelines</li>
+                    <li>xStream&apos;s Terms of Service and Creator Guidelines</li>
                     <li>
                       Instant settlement of viewer payments to your connected
                       wallet
@@ -921,6 +916,17 @@ export default function UploadPage() {
                     <p className="text-white font-light">{maxQuality}</p>
                   </div>
                 </div>
+
+                <p className="text-xs text-white/50 mb-6 font-light">
+                  {uploadedVideoUrl && (
+                    <>
+                      View your video here:{" "}
+                      <Link href={uploadedVideoUrl} className="text-white">
+                        {uploadedVideoUrl}
+                      </Link>
+                    </>
+                  )}
+                </p>
 
                 <div className="flex flex-col sm:flex-row justify-center gap-4">
                   <Link href="/browse">

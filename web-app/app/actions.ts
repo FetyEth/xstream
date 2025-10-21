@@ -25,10 +25,10 @@ export async function verifyPayment(payload: string): Promise<string> {
     },
   };
 
+  // @es-lint-disable-next-line react-hooks/rules-of-hooks
   const { verify, settle } = useFacilitator({
     url: "http://localhost:3002"
-  }
-  ); // eslint-disable-line
+  });
 
   try {
     const payment = exact.evm.decodePayment(payload);

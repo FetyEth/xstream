@@ -13,7 +13,7 @@ import {
   Identity,
   EthBalance
 } from '@coinbase/onchainkit/identity';
-import { Search, Upload as UploadIcon } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 

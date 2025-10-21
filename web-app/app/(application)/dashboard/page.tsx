@@ -14,7 +14,6 @@ import {
   Video, 
   Users, 
   Award,
-  Download,
   Wallet,
   Zap,
   PlayCircle,
@@ -365,7 +364,7 @@ export default function DashboardPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="font-light">Spending Insights</CardTitle>
-                  <CardDescription className="font-light">How you're using xStream</CardDescription>
+                  <CardDescription className="font-light">How you&apos;re using xStream</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -376,7 +375,7 @@ export default function DashboardPage() {
 
                     <div className="p-4 bg-white/[0.02] rounded-md border border-white/10">
                       <h4 className="font-light text-white mb-2">Savings vs Traditional</h4>
-                      <p className="text-sm text-white/50 font-light">You've saved ~$15.67 compared to traditional subscriptions</p>
+                      <p className="text-sm text-white/50 font-light">You&apos;ve saved ~$15.67 compared to traditional subscriptions</p>
                     </div>
 
                     <div className="p-4 bg-white/[0.02] rounded-md border border-white/10">

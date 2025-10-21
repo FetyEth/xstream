@@ -12,8 +12,7 @@ import {
   Pause, 
   Volume2, 
   VolumeX, 
-  Maximize, 
-  Settings, 
+  Maximize,
   DollarSign, 
   Zap, 
   AlertCircle,
@@ -143,7 +142,7 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
             className="w-full h-full"
             src={video.videoUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"}
             onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
-            onLoadedMetadata={(e) => setCurrentTime(0)}
+            onLoadedMetadata={() => setCurrentTime(0)}
           />
           
           {/* Player Controls Overlay */}
@@ -240,7 +239,7 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
                   <Wallet className="h-12 w-12 mx-auto mb-4 text-white" />
                   <h3 className="text-lg font-light mb-2 text-white">Stake to Watch</h3>
                   <p className="text-white/50 mb-4 font-light">
-                    Stake funds to start watching. You'll only be charged for what you actually watch.
+                    Stake funds to start watching. You&apos;ll only be charged for what you actually watch.
                   </p>
                   <Button onClick={() => setShowStakeDialog(true)} className="w-full">
                     <DollarSign className="h-4 w-4 mr-2" />
@@ -288,7 +287,7 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
           <DialogHeader>
             <DialogTitle className="font-light">Stake Funds to Watch</DialogTitle>
             <DialogDescription className="font-light">
-              Stake the maximum amount you're willing to spend. You'll only be charged for the time you actually watch.
+              Stake the maximum amount you&apos;re willing to spend. You&apos;ll only be charged for the time you actually watch.
             </DialogDescription>
           </DialogHeader>
           
