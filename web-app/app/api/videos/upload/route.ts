@@ -6,6 +6,10 @@ import { promisify } from 'util';
 import { writeFile, readdir, readFile, mkdir, rm } from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
+import ffmpegPath from 'ffmpeg-static';
+const ffprobeStatic = require('ffprobe-static');
+// @ts-ignore
+// import ffprobeStatic from 'ffprobe-static';
 
 const execAsync = promisify(exec);
 
@@ -33,7 +37,8 @@ interface VideoMetadata {
  * Get video metadata using FFprobe
  */
 async function getVideoMetadata(filePath: string): Promise<VideoMetadata> {
-  const command = `ffprobe -v quiet -print_format json -show_format -show_streams "${filePath}"`;
+  // const ffprobePath = ffprobeStatic;
+  const command = `"${ffprobeStatic}" -v quiet -print_format json -show_format -show_streams "${filePath}"`;
   const { stdout } = await execAsync(command);
   const metadata = JSON.parse(stdout);
   
@@ -61,7 +66,7 @@ async function createHLSSegments(
 
   // FFmpeg command for HLS segmentation
   // vf=scale forces dimensions to be divisible by 2
-  const command = `ffmpeg -i "${inputPath}" \
+  const command = `"${ffmpegPath}" -i "${inputPath}" \
     -vf "scale='trunc(iw/2)*2:trunc(ih/2)*2'" \
     -c:v libx264 -profile:v baseline -level 3.0 \
     -c:a aac -b:a 128k \
@@ -98,7 +103,7 @@ async function createAdaptiveBitrate(
     await mkdir(qualityDir, { recursive: true });
 
     // Force dimensions to be divisible by 2 using scale filter
-    const command = `ffmpeg -i "${inputPath}" \
+    const command = `"${ffmpegPath}" -i "${inputPath}" \
       -vf "scale='min(${quality.width},iw)':'min(${quality.height},ih)':force_original_aspect_ratio=decrease,scale='trunc(iw/2)*2:trunc(ih/2)*2'" \
       -c:v libx264 -preset fast -crf 23 -b:v ${quality.bitrate} \
       -c:a aac -b:a 128k \
@@ -176,7 +181,7 @@ async function generateThumbnail(
   outputPath: string
 ): Promise<void> {
   // Force dimensions to be divisible by 2
-  const command = `ffmpeg -i "${inputPath}" -ss 00:00:02 -vframes 1 -vf "scale='trunc(iw/2)*2:trunc(ih/2)*2'" "${outputPath}"`;
+  const command = `"${ffmpegPath}" -i "${inputPath}" -ss 00:00:02 -vframes 1 -vf "scale='trunc(iw/2)*2:trunc(ih/2)*2'" "${outputPath}"`;
   await execAsync(command);
 }
 
