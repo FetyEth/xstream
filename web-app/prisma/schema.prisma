@@ -1,6 +1,3 @@
-// xStream Database Schema - MVP Version
-// Simplified pay-per-second video monetization platform
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,107 +7,71 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User Management
 model User {
-  id            String   @id @default(cuid())
-  walletAddress String   @unique
+  id            String           @id @default(cuid())
+  walletAddress String           @unique
   username      String?
   displayName   String?
   profileImage  String?
-  
-  // Timestamps
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  // Relations
-  videos        Video[]
-  viewSessions  ViewSession[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
   earnings      CreatorEarning[]
-  
+  videos        Video[]          @relation("UserVideos")
+  viewSessions  ViewSession[]
+
   @@map("users")
 }
 
-// Video Content Management
 model Video {
-  id                String   @id @default(cuid())
-  title             String
-  description       String?
-  
-  // Video File Information
-  videoUrl          String
-  thumbnailUrl      String
-  duration          Int      // Duration in seconds
-  
-  // Pricing
-  pricePerSecond    Decimal  @db.Decimal(18, 8) // Price in ETH/wei
-  totalEarnings     Decimal  @default(0) @db.Decimal(18, 8)
-  
-  // Metadata
-  category          String?
-  tags              String[]
-  
-  // Analytics
-  totalViews        Int      @default(0)
-  totalWatchTime    Int      @default(0) // Total seconds watched
-  
-  // Creator Information
-  creatorWallet   String
-  creator         User @relation(fields: [creatorWallet], references: [walletAddress], onDelete: Cascade)
-  
-  // Timestamps
-  publishedAt       DateTime @default(now())
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  
-  // Relations
-  viewSessions      ViewSession[]
-  
+  id             String        @id @default(cuid())
+  title          String
+  description    String?
+  videoUrl       String
+  thumbnailUrl   String
+  duration       Int
+  pricePerSecond Decimal       @db.Decimal(18, 8)
+  totalEarnings  Decimal       @default(0) @db.Decimal(18, 8)
+  category       String?
+  tags           String[]
+  totalViews     Int           @default(0)
+  totalWatchTime Int           @default(0)
+  creatorWallet  String
+  publishedAt    DateTime      @default(now())
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  creator        User          @relation("UserVideos", fields: [creatorWallet], references: [walletAddress], onDelete: Cascade)
+  viewSessions   ViewSession[]
+
   @@map("videos")
 }
 
-// Viewing Sessions & Analytics
 model ViewSession {
-  id               String   @id @default(cuid())
-  
-  // Session Details
-  sessionToken     String   @unique
-  startTime        DateTime @default(now())
-  endTime          DateTime?
-  watchedSeconds   Int      @default(0)
-  
-  // Billing
-  amountCharged    Decimal  @default(0) @db.Decimal(18, 8)
-  
-  // Status (ACTIVE, COMPLETED, CANCELLED)
-  status           String   @default("ACTIVE")
-  
-  // Relations
-  viewerId         String
-  viewer           User     @relation(fields: [viewerId], references: [id], onDelete: Cascade)
-  videoId          String
-  video            Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  
+  id             String    @id @default(cuid())
+  sessionToken   String    @unique
+  startTime      DateTime  @default(now())
+  endTime        DateTime?
+  watchedSeconds Int       @default(0)
+  amountCharged  Decimal   @default(0) @db.Decimal(18, 8)
+  status         String    @default("ACTIVE")
+  viewerId       String
+  videoId        String
+  video          Video     @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  viewer         User      @relation(fields: [viewerId], references: [id], onDelete: Cascade)
+
   @@map("view_sessions")
 }
 
-// Creator Economics
 model CreatorEarning {
-  id             String   @id @default(cuid())
-  amount         Decimal  @db.Decimal(18, 8)
-  
-  // Transaction Details
-  txHash         String?  // Blockchain transaction hash
-  status         String   @default("PENDING") // PENDING, PAID
-  
-  // Reference
-  videoId        String?  // Reference to video
-  sessionId      String?  // Reference to session
-  
-  creatorId      String
-  creator        User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
-  
-  createdAt      DateTime @default(now())
-  paidAt         DateTime?
-  
+  id        String    @id @default(cuid())
+  amount    Decimal   @db.Decimal(18, 8)
+  txHash    String?
+  status    String    @default("PENDING")
+  videoId   String?
+  sessionId String?
+  creatorId String
+  createdAt DateTime  @default(now())
+  paidAt    DateTime?
+  creator   User      @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
   @@map("creator_earnings")
 }

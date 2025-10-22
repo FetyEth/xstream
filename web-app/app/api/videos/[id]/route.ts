@@ -8,10 +8,10 @@ interface Params {
 // GET /api/videos/[id] - Get specific video with creator info
 export async function GET(
   request: NextRequest, 
-  { params }: { params: Params }
+  { params }: { params: Promise<Params> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
     
     const video = await videoService.getVideoById(id)
     

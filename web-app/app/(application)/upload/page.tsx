@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "../../../components/Header";
 import { Name } from "@coinbase/onchainkit/identity";
@@ -23,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   Eye,
   Zap,
@@ -37,11 +39,13 @@ import {
 import Image from "next/image";
 
 export default function UploadPage() {
+  const router = useRouter();
   const [uploadStep, setUploadStep] = useState(1);
   const { address, isConnected } = useAccount();
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("Education");
   const [tags, setTags] = useState("");
   const [pricePerSecond, setPricePerSecond] = useState("0.01");
   const [maxQuality, setMaxQuality] = useState("1080p");
@@ -49,16 +53,14 @@ export default function UploadPage() {
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [category, setCategory] = useState("Education");
-  const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
 
   const handleVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       // Validate file size (max 500MB for demo)
       if (file.size > 500 * 1024 * 1024) {
-        setUploadError("File size must be less than 500MB");
+        setError("File size must be less than 500MB");
         return;
       }
 
@@ -70,12 +72,12 @@ export default function UploadPage() {
         "video/x-ms-wmv",
       ];
       if (!validTypes.includes(file.type)) {
-        setUploadError("Please upload a valid video file (MP4, MOV, AVI, WMV)");
+        setError("Please upload a valid video file (MP4, MOV, AVI, WMV)");
         return;
       }
 
       setVideoFile(file);
-      setUploadError(null);
+      setError(null);
       setUploadStep(2);
     }
   };
@@ -101,97 +103,73 @@ export default function UploadPage() {
 
   const handleSubmit = async () => {
     if (!address || !isConnected) {
-      setUploadError("Please connect your wallet first");
+      setError("Please connect your wallet first");
       return;
     }
 
     if (!videoFile) {
-      setUploadError("Please select a video file");
+      setError("Please select a video file");
       return;
     }
 
     if (!title.trim()) {
-      setUploadError("Please enter a video title");
+      setError("Please enter a video title");
+      return;
+    }
+
+    if (!category.trim()) {
+      setError("Please select a category");
       return;
     }
 
     setIsUploading(true);
-    setUploadError(null);
-    setUploadProgress(0);
+    setError(null);
+    setUploadProgress(10);
 
     try {
-      // Create FormData for multipart upload
       const formData = new FormData();
       formData.append("video", videoFile);
       formData.append("title", title.trim());
       formData.append("description", description.trim());
-      formData.append("pricePerSecond", pricePerSecond);
-      formData.append("maxQuality", maxQuality);
       formData.append("category", category);
       formData.append("tags", tags);
-      formData.append("creatorId", address);
+      
+      if (address) {
+        formData.append("walletAddress", address);
+      }
 
       if (thumbnail) {
         formData.append("thumbnail", thumbnail);
       }
-      console.log(formData)
-      setUploadProgress(10);
 
-      // Upload and process video
-      const response = await fetch("/api/videos/upload", {
+      setUploadProgress(30);
+
+      const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       });
 
-      setUploadProgress(90);
+      setUploadProgress(60);
 
       if (!response.ok) {
-        const error = await response.json();
+        const errorData = await response.json();
         throw new Error(
-          error.error || error.details || "Failed to upload video"
+          errorData.error || errorData.details || "Failed to upload video"
         );
       }
 
       const data = await response.json();
       console.log("Video uploaded successfully:", data);
 
-      setUploadProgress(95);
-      // Save to your videos table
-      const saveResponse = await fetch("/api/videos", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: title.trim(),
-          description: description.trim() || undefined,
-          videoUrl: data.playlistUrl,
-          thumbnailUrl: data.thumbnailUrl,
-          duration: data.video.duration,
-          pricePerSecond: parseFloat(pricePerSecond),
-          category,
-          tags: tags
-            ? tags
-                .split(",")
-                .map((t: string) => t.trim())
-                .filter(Boolean)
-            : [],
-          creatorWallet: address,
-        }),
-      });
-
-      if (!saveResponse.ok) {
-        const error = await saveResponse.json();
-        console.error("Failed to save metadata:", error);
-        // Don't throw - video is already uploaded
-      }
-
       setUploadProgress(100);
-      setUploadedVideoUrl(data.playlistUrl);
-      setUploadStep(5);
+      
+      setTimeout(() => {
+        router.push(`/watch/${data.video.id}`);
+      }, 1000);
+
     } catch (error) {
       console.error("Upload error:", error);
-      setUploadError(
+      setError(
         error instanceof Error ? error.message : "Failed to upload video"
       );
     } finally {
@@ -219,7 +197,7 @@ export default function UploadPage() {
     setMaxQuality("1080p");
     setThumbnail(null);
     setThumbnailPreview(null);
-    setUploadError(null);
+    seterror(null);
     setUploadProgress(0);
     setUploadedVideoUrl("");
     setCategory("Education");
@@ -348,9 +326,9 @@ export default function UploadPage() {
                     </p>
                   </div>
 
-                  {uploadError && (
+                  {error && (
                     <div className="mt-4 p-3 bg-white/[0.02] border border-white/10 rounded-lg backdrop-blur-xl">
-                      <p className="text-white/70 text-sm font-light">{uploadError}</p>
+                      <p className="text-white/70 text-sm font-light">{error}</p>
                     </div>
                   )}
                 </div>
@@ -804,7 +782,7 @@ export default function UploadPage() {
               )}
 
               {/* Error Message */}
-              {uploadError && (
+              {error && (
                 <div className="bg-white/[0.02] p-4 rounded-lg border border-white/10 backdrop-blur-xl">
                   <div className="flex items-start space-x-2">
                     <AlertCircle className="h-5 w-5 text-white/70 mt-0.5 flex-shrink-0" />
@@ -812,11 +790,11 @@ export default function UploadPage() {
                       <h4 className="font-light text-white mb-1">
                         Upload Failed
                       </h4>
-                      <p className="text-sm text-white/70 font-light">{uploadError}</p>
+                      <p className="text-sm text-white/70 font-light">{error}</p>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setUploadError(null)}
+                        onClick={() => seterror(null)}
                         className="mt-3"
                       >
                         Dismiss

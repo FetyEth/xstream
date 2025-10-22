@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Hls from "hls.js";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,7 @@ import {
   Volume2, 
   VolumeX, 
   Maximize,
+  Settings,
   DollarSign, 
   Zap, 
   AlertCircle,
@@ -43,9 +45,85 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
   const [stakeAmount, setStakeAmount] = useState("");
   const [currentSpent, setCurrentSpent] = useState(0);
   const [isStaked, setIsStaked] = useState(false);
+  const [videoSrc, setVideoSrc] = useState<string>("");
+  const [loadingUrl, setLoadingUrl] = useState(true);
+  const [availableQualities, setAvailableQualities] = useState<string[]>([]);
+  const [currentQualityIndex, setCurrentQualityIndex] = useState<number>(-1);
+  const [showSettings, setShowSettings] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
+  const hlsRef = useRef<Hls | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Fetch secure signed URL from backend
+  useEffect(() => {
+    async function fetchSecureUrl() {
+      try {
+        setLoadingUrl(true);
+        const streamUrl = `/api/videos/${video.id}/stream`;
+        setVideoSrc(streamUrl);
+        setLoadingUrl(false);
+      } catch (error) {
+        console.error('Error setting stream URL:', error);
+        setLoadingUrl(false);
+      }
+    }
+
+    if (video.id) {
+      fetchSecureUrl();
+    }
+  }, [video.id]);
+
+  useEffect(() => {
+    if (!videoSrc || !videoRef.current) return;
+
+    const videoElement = videoRef.current;
+    const isHLS = videoSrc.includes('.m3u8') || videoSrc.includes('/stream');
+
+    if (isHLS && Hls.isSupported()) {
+      const hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: true,
+        backBufferLength: 90,
+      });
+      
+      hlsRef.current = hls;
+      hls.loadSource(videoSrc);
+      hls.attachMedia(videoElement);
+
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        const qualities = hls.levels.map(l => `${l.height}p`);
+        setAvailableQualities(['Auto', ...qualities]);
+        setCurrentQualityIndex(0);
+        hls.currentLevel = -1;
+      });
+
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        if (data.fatal) {
+          switch (data.type) {
+            case Hls.ErrorTypes.NETWORK_ERROR:
+              hls.startLoad();
+              break;
+            case Hls.ErrorTypes.MEDIA_ERROR:
+              hls.recoverMediaError();
+              break;
+            default:
+              hls.destroy();
+              break;
+          }
+        }
+      });
+
+      return () => {
+        hls.destroy();
+      };
+    } else if (isHLS && videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+      videoElement.src = videoSrc;
+    } else {
+      videoElement.src = videoSrc;
+    }
+  }, [videoSrc]);
 
   // Calculate quality multiplier for pricing
   const getQualityMultiplier = (selectedQuality: string) => {
@@ -72,6 +150,39 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  // Handle quality change
+  const changeQuality = (qualityIndex: number) => {
+    if (!hlsRef.current) return;
+    
+    const hls = hlsRef.current;
+    setCurrentQualityIndex(qualityIndex);
+    
+    if (qualityIndex === 0) {
+      // Auto quality
+      hls.currentLevel = -1;
+      console.log('✅ Quality set to Auto');
+    } else {
+      // Specific quality (subtract 1 because index 0 is "Auto")
+      hls.currentLevel = qualityIndex - 1;
+      console.log(`✅ Quality set to ${availableQualities[qualityIndex]}`);
+    }
+    
+    setShowSettings(false);
+  };
+
+  // Handle fullscreen
+  const toggleFullscreen = () => {
+    if (!containerRef.current) return;
+    
+    if (!document.fullscreenElement) {
+      containerRef.current.requestFullscreen().catch(err => {
+        console.error('Error attempting to enable fullscreen:', err);
+      });
+    } else {
+      document.exitFullscreen();
+    }
   };
 
   // Handle play/pause
@@ -127,6 +238,19 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
     };
   }, [isPlaying, isStaked, quality]);
 
+  // Close settings menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (showSettings && !target.closest('.quality-selector')) {
+        setShowSettings(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showSettings]);
+
   // Available quality options (simplified for demo)
   const qualityOptions = ['4K', '1080p', '720p', '480p', '240p'].filter(q => 
     getQualityMultiplier(q) <= getQualityMultiplier(video.maxQuality)
@@ -136,14 +260,41 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
     <div className="space-y-4">
       {/* Video Player */}
       <Card className="overflow-hidden">
-        <div className="relative aspect-video bg-black">
-          <video
-            ref={videoRef}
-            className="w-full h-full"
-            src={video.videoUrl || "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"}
-            onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
-            onLoadedMetadata={() => setCurrentTime(0)}
-          />
+        <div ref={containerRef} className="relative aspect-video bg-black">
+          {loadingUrl && (
+            <div className="absolute inset-0 flex items-center justify-center text-white z-[5] bg-black/50 backdrop-blur-sm">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+                <p>Loading secure video stream...</p>
+              </div>
+            </div>
+          )}
+          {!loadingUrl && !videoSrc && (
+            <div className="absolute inset-0 flex items-center justify-center text-white z-10">
+              <p>Failed to load video. Please try again.</p>
+            </div>
+          )}
+          {!loadingUrl && videoSrc && (
+            <video
+              ref={videoRef}
+              className="w-full h-full"
+              preload="metadata"
+              onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
+              onLoadedMetadata={() => {
+                setCurrentTime(0);
+                console.log('✅ Video loaded successfully');
+              }}
+              onError={(e) => {
+                console.error('❌ Video playback error');
+                const videoElement = e.currentTarget;
+                if (videoElement.error) {
+                  console.error('Error code:', videoElement.error.code);
+                  console.error('Error message:', videoElement.error.message);
+                }
+              }}
+              onCanPlay={() => console.log('✅ Video ready to play')}
+            />
+          )}
           
           {/* Player Controls Overlay */}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent backdrop-blur-sm p-4">
@@ -205,24 +356,45 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
                 </span>
               </div>
 
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 relative">
                 {/* Quality Selector */}
-                <Select value={quality} onValueChange={setQuality}>
-                  <SelectTrigger className="w-24 h-8 bg-white/10 backdrop-blur-md border-white/20 text-white font-light">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {qualityOptions.map((q) => (
-                      <SelectItem key={q} value={q}>
-                        {q}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {availableQualities.length > 0 && (
+                  <div className="relative quality-selector">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowSettings(!showSettings)}
+                      className="text-white hover:text-white hover:bg-white/10 font-light px-3"
+                    >
+                      <span className="text-sm">
+                        {currentQualityIndex >= 0 ? availableQualities[currentQualityIndex] : 'Quality'}
+                      </span>
+                    </Button>
+                    
+                    {showSettings && (
+                      <div className="absolute bottom-full right-0 mb-2 bg-black/90 backdrop-blur-md rounded-lg border border-white/20 p-2 min-w-[120px]">
+                        <div className="text-xs text-white/60 px-3 py-1 mb-1">Quality</div>
+                        {availableQualities.map((qual, index) => (
+                          <button
+                            key={qual}
+                            onClick={() => changeQuality(index)}
+                            className={`w-full text-left px-3 py-2 rounded text-sm hover:bg-white/10 transition-colors ${
+                              currentQualityIndex === index ? 'text-blue-400' : 'text-white'
+                            }`}
+                          >
+                            {qual} {currentQualityIndex === index && '✓'}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
 
+                {/* Fullscreen Button */}
                 <Button
                   variant="ghost"
                   size="sm"
+                  onClick={toggleFullscreen}
                   className="text-white hover:text-white hover:bg-white/10 font-light"
                 >
                   <Maximize className="h-5 w-5" />
