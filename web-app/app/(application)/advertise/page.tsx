@@ -86,14 +86,14 @@ export default function AdvertisePage() {
 
   return (
     <div className="min-h-screen">
-      <div className="mt-2 bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl border-b border-white/10">
+      <div className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl border-b border-white/10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Image src='/logo.png' alt='xStream Logo' width={36} height={36} />
               <div>
                 <h2 className="text-white font-light text-lg">Creator Studio - Advertising</h2>
-                <p className="text-white/50 font-light text-xs">Reach your audience with targeted ads</p>
+                <p className="text-white/70 font-light text-xs">Reach your audience with targeted ads</p>
               </div>
             </div>
           </div>

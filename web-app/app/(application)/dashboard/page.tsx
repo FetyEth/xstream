@@ -85,7 +85,7 @@ export default function DashboardPage() {
           <div className="flex flex-col items-start gap-3 mb-4">
             <h1 className="text-4xl font-light text-white">
               {isConnected && address ? (
-                <> Welcome back, <Name address={address} className="text-white/70" /> </>
+                <> Welcome back </>
               ) : (
                 <>Dashboard</>
               )}

@@ -235,7 +235,6 @@ export default function UploadPage() {
 
   return (
     <div className="min-h-screen">
-      <Header />
 
       {/* Creator Tool Banner */}
       <div className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-xl border-b border-white/10">
@@ -247,7 +246,7 @@ export default function UploadPage() {
                 <h2 className="text-white font-light text-lg">
                   Creator Studio - Upload
                 </h2>
-                <p className="text-white/70 text-sm">
+                <p className="text-white/70 text-xs">
                   Share your content and start earning
                 </p>
               </div>
