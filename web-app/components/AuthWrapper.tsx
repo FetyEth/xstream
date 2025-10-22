@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { UserProvider, useUser } from '../app/hooks/useUser';
+import { Loading } from './ui/loading';
 
 interface AuthWrapperProps {
   children: React.ReactNode;
@@ -34,10 +35,7 @@ function AuthContent({ children }: AuthWrapperProps) {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-neutral-950 via-neutral-900 to-black flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
+        <Loading text="Authenticating..." size="lg" />
       </div>
     );
   }
