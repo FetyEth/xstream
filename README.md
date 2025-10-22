@@ -52,6 +52,7 @@ The creator economy is broken. Traditional streaming platforms extract **30–55
 | UI         | shadcn/ui, Tailwind CSS    |
 | Blockchain | Base (Coinbase L2)         |
 | Database   | PostgreSQL, Prisma ORM     |
+| Storage    | AWS S3                     |
 | Wallet     | OnchainKit (Coinbase)      |
 
 ## Smart Contract Architecture
@@ -101,9 +102,10 @@ The creator economy is broken. Traditional streaming platforms extract **30–55
 ## Platform Features
 
 - **Homepage** — Content discovery and trending videos
-- **Video Player** — Pay-per-second billing interface
+- **Video Player** — Adaptive streaming with quality selection
+- **Pay-Per-Second Billing** — Stake-based viewing with automatic refunds
 - **Creator Dashboard** — Upload workflow and analytics
-- **Achievement System** — NFT rewards for engagement
+- **Achievement System** — NFT rewards for engagement milestones
 - **Ad Management** — Campaign creation and targeting
 
 ## Getting Started
