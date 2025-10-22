@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Header from "../../../components/Header";
 import { Name } from "@coinbase/onchainkit/identity";
 import { useAccount } from "wagmi";
 import {

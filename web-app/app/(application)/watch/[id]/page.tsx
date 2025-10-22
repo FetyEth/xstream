@@ -22,13 +22,11 @@ import {
   Users
 } from "lucide-react";
 import VideoPlayer from "@/components/VideoPlayer";
-import VideoCard from "@/components/VideoCard";
 
 export default function WatchPage() {
   const params = useParams();
   const videoId = params.id;
   const [video, setVideo] = useState<any>(null);
-  const [suggestedVideos, setSuggestedVideos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,13 +45,6 @@ export default function WatchPage() {
         
         const data = await response.json();
         setVideo(data.video);
-        
-        // Fetch suggested videos
-        const suggestedResponse = await fetch('/api/videos?limit=3');
-        if (suggestedResponse.ok) {
-          const suggestedData = await suggestedResponse.json();
-          setSuggestedVideos(suggestedData.videos || []);
-        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load video');
       } finally {
@@ -88,9 +79,7 @@ export default function WatchPage() {
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+        <div className="max-w-5xl mx-auto space-y-6">
             {/* Video Player */}
             <VideoPlayer video={video} />
 
@@ -224,19 +213,6 @@ export default function WatchPage() {
                 </div>
               </CardContent>
             </Card>
-          </div>
-
-          {/* Sidebar - Suggested Videos */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-light text-white">
-              Up Next
-            </h3>
-            <div className="space-y-4">
-              {suggestedVideos.map((video: any) => (
-                <VideoCard key={video.id} video={video} />
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>
