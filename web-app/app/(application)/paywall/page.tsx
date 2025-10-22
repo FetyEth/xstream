@@ -110,7 +110,7 @@ export default function Paywall() {
     resource: "https://example.com",
     description: "Payment for a service",
     mimeType: "text/html",
-    payTo: "0x209693Bc6afc0C5328bA36FaF03C514EF312287C",
+    payTo: "0x86EA19b5647aF1beF9DCa055737417EF877ff935",
     maxTimeoutSeconds: 60,
     asset: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
     outputSchema: undefined,

@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
     const maxQuality = formData.get('maxQuality') as string;
     const category = formData.get('category') as string;
     const tags = formData.get('tags') as string;
-    const creatorId = formData.get('creatorId') as string;
+    const creatorWallet = formData.get('creatorWallet') as string;
 
     if (!videoFile) {
       return NextResponse.json(
@@ -263,7 +263,7 @@ export async function POST(request: NextRequest) {
       maxQuality,
       category,
       tags: tags ? tags.split(',').map(t => t.trim()) : [],
-      creatorId,
+      creatorWallet,
       createdAt: new Date(),
     };
 

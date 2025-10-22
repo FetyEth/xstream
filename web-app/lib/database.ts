@@ -91,14 +91,18 @@ export const videoService = {
     tags?: string[]
     creatorWallet: string
   }) {
+    // Normalize wallet address to lowercase for consistency
+    const normalizedWallet = data.creatorWallet.toLowerCase();
+    console.log("Creating video with creatorWallet:", normalizedWallet);
+    
     // First, ensure the user exists
     await prisma.user.upsert({
-      where: { walletAddress: data.creatorWallet },
+      where: { walletAddress: normalizedWallet },
       update: {}, // Don't update anything if exists
       create: {
-        walletAddress: data.creatorWallet,
+        walletAddress: normalizedWallet,
         // Optional: Set default username
-        username: `user_${data.creatorWallet.slice(0, 8)}`,
+        username: `user_${normalizedWallet.slice(0, 8)}`,
       },
     });
 
@@ -115,7 +119,7 @@ export const videoService = {
         tags: data.tags || [],
         creator: {
           connect: {
-            walletAddress: data.creatorWallet,
+            walletAddress: normalizedWallet,
           },
         },
       },

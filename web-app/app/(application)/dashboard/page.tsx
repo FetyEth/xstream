@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Name } from "@coinbase/onchainkit/identity";
 import { useAccount } from "wagmi";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -85,7 +84,7 @@ export default function DashboardPage() {
           <div className="flex flex-col items-start gap-3 mb-4">
             <h1 className="text-4xl font-light text-white">
               {isConnected && address ? (
-                <> Welcome back, <Name address={address} className="text-white/70" /> </>
+                <> Welcome back </>
               ) : (
                 <>Dashboard</>
               )}

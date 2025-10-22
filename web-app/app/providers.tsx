@@ -5,12 +5,10 @@ import { OnchainKitProvider } from '@coinbase/onchainkit';
 import { WagmiProvider, createConfig, http } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { coinbaseWallet, metaMask, walletConnect } from 'wagmi/connectors';
-import { useAutoCreateUser } from './hooks/useAutoCreateUser';
 import type { ReactNode } from 'react';
 
-// Wagmi config with OnchainKit
 const config = createConfig({
-  chains: [base, baseSepolia, mainnet, sepolia, optimism, arbitrum, polygon],
+  chains: [base, baseSepolia],
   connectors: [
     coinbaseWallet({
       appName: 'xStream',
@@ -23,22 +21,12 @@ const config = createConfig({
   ],
   transports: {
     [base.id]: http(),
-    [baseSepolia.id]: http(),
-    [mainnet.id]: http(),
-    [sepolia.id]: http(),
-    [optimism.id]: http(),
-    [arbitrum.id]: http(),
-    [polygon.id]: http(),
+    [baseSepolia.id]: http()
   },
   ssr: true,
 });
 
 const queryClient = new QueryClient();
-
-function AutoCreateUserWrapper({ children }: { children: ReactNode }) {
-  useAutoCreateUser();
-  return <>{children}</>;
-}
 
 export function Providers(props: { children: ReactNode }) {
   return (
@@ -46,7 +34,7 @@ export function Providers(props: { children: ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <OnchainKitProvider
           apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
-          chain={base}
+          chain={baseSepolia}
           config={{
             appearance: {
               mode: 'dark',
@@ -54,9 +42,7 @@ export function Providers(props: { children: ReactNode }) {
             },
           }}
         >
-          <AutoCreateUserWrapper>
-            {props.children}
-          </AutoCreateUserWrapper>
+          {props.children}
         </OnchainKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
