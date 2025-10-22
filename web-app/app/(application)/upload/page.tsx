@@ -36,11 +36,11 @@ export default function UploadPage() {
   const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string>("");
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
-  // x402 Payment Requirements for upload fee ($0.50 in USDC)
+  // x402 Payment Requirements for upload fee ($0.01 in USDC)
   const paymentRequirements: PaymentRequirements = {
     scheme: "exact",
     network: "base-sepolia",
-    maxAmountRequired: "500000", // 0.50 USDC (6 decimals)
+    maxAmountRequired: "10000", // 0.01 USDC (6 decimals)
     resource: "https://xstream.app/upload",
     description: "xStream Upload Fee",
     mimeType: "application/json",

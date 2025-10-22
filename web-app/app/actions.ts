@@ -90,13 +90,13 @@ export async function verifyPayment(payload: string): Promise<string> {
 }
 
 /**
- * Verify upload fee payment ($0.50 USDC)
+ * Verify upload fee payment ($0.01 USDC for testing)
  */
 export async function verifyUploadPayment(payload: string): Promise<string> {
   const paymentRequirements: PaymentRequirements = {
     scheme: "exact",
     network: "base-sepolia",
-    maxAmountRequired: "500000", // 0.50 USDC (6 decimals)
+    maxAmountRequired: "10000", // 0.01 USDC (6 decimals) - reduced for testing
     resource: "http://localhost:3000/upload",
     description: "xStream Upload Fee",
     mimeType: "application/json",
