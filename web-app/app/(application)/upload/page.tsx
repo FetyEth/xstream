@@ -13,7 +13,6 @@ import UploadSteps from "./components/UploadSteps";
 import VideoUploadForm from "./components/VideoUploadForm";
 import VideoDetailsForm from "./components/VideoDetailsForm";
 import PricingSettingsForm from "./components/PricingSettingsForm";
-import { Progress } from "@/components/ui/progress";
 import PublishReview from "./components/PublishReview";
 import SuccessMessage from "./components/SuccessMessage";
 
@@ -33,7 +32,8 @@ export default function UploadPage() {
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string>("");
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   // x402 Payment Requirements for upload fee ($0.50 in USDC)
@@ -59,7 +59,7 @@ export default function UploadPage() {
     if (file) {
       // Validate file size (max 500MB for demo)
       if (file.size > 500 * 1024 * 1024) {
-        setError("File size must be less than 500MB");
+        setUploadError("File size must be less than 500MB");
         return;
       }
 
@@ -71,12 +71,12 @@ export default function UploadPage() {
         "video/x-ms-wmv",
       ];
       if (!validTypes.includes(file.type)) {
-        setError("Please upload a valid video file (MP4, MOV, AVI, WMV)");
+        setUploadError("Please upload a valid video file (MP4, MOV, AVI, WMV)");
         return;
       }
 
       setVideoFile(file);
-      setError(null);
+      setUploadError(null);
       setUploadStep(2);
     }
   };
@@ -102,28 +102,28 @@ export default function UploadPage() {
 
   const handleSubmit = async () => {
     if (!address || !isConnected) {
-      setError("Please connect your wallet first");
+      setUploadError("Please connect your wallet first");
       return;
     }
 
     if (!videoFile) {
-      setError("Please select a video file");
+      setUploadError("Please select a video file");
       return;
     }
 
     if (!title.trim()) {
-      setError("Please enter a video title");
+      setUploadError("Please enter a video title");
       return;
     }
 
     if (!category.trim()) {
-      setError("Please select a category");
+      setUploadError("Please select a category");
       return;
     }
 
     setIsUploading(true);
     setIsProcessingPayment(true);
-    setError(null);
+    setUploadError(null);
     setUploadProgress(10);
 
     try {
@@ -191,10 +191,6 @@ export default function UploadPage() {
       formData.append("description", description.trim());
       formData.append("category", category);
       formData.append("tags", tags);
-      
-      if (address) {
-        formData.append("walletAddress", address);
-      }
       formData.append("creatorWallet", address);
 
       if (thumbnail) {
@@ -348,203 +344,6 @@ export default function UploadPage() {
             onDismissError={() => setUploadError(null)}
             formatFileSize={formatFileSize}
           />
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-white font-light">
-                <CheckCircle className="h-5 w-5 mr-2 text-white/70" />
-                Ready to Publish
-              </CardTitle>
-              <CardDescription className="text-white/70 font-light">
-                Review your video details and publish to xStream
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Video Summary */}
-              <div className="border border-white/10 rounded-lg p-4 bg-white/[0.02] backdrop-blur-xl">
-                <h4 className="font-light mb-4 text-white flex items-center">
-                  <Video className="h-4 w-4 mr-2" />
-                  Video Summary
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-white/70 font-light">Title:</span>
-                    <p className="font-light text-white mt-1">
-                      {title || "Untitled Video"}
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-white/70 font-light">Category:</span>
-                    <p className="font-light text-white mt-1">{category}</p>
-                  </div>
-                  <div>
-                    <span className="text-white/70 font-light">Max Quality:</span>
-                    <p className="font-light text-white mt-1">{maxQuality}</p>
-                  </div>
-                  <div>
-                    <span className="text-white/70 font-light">Price per Second:</span>
-                    <p className="font-light text-white mt-1">
-                      ${pricePerSecond}
-                    </p>
-                  </div>
-                  {videoFile && (
-                    <div>
-                      <span className="text-white/70 font-light">File Size:</span>
-                      <p className="font-light text-white mt-1">
-                        {formatFileSize(videoFile.size)}
-                      </p>
-                    </div>
-                  )}
-                  <div>
-                    <span className="text-white/70 font-light">Upload Fee:</span>
-                    <p className="font-light text-white mt-1">
-                      $0.50 (via x402)
-                    </p>
-                  </div>
-                  {tags && (
-                    <div className="col-span-2">
-                      <span className="text-white/70 font-light">Tags:</span>
-                      <p className="font-light text-white mt-1">{tags}</p>
-                    </div>
-                  )}
-                  {description && (
-                    <div className="col-span-2">
-                      <span className="text-white/70 font-light">Description:</span>
-                      <p className="font-light text-white mt-1 text-sm">
-                        {description}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Terms */}
-              <div className="bg-white/[0.02] p-4 rounded-lg border border-white/10 backdrop-blur-xl">
-                <h4 className="text-white font-light mb-2">
-                  Creator Agreement
-                </h4>
-                <div className="text-sm text-white/70 space-y-2 font-light">
-                  <p className="text-white mb-2 font-light">
-                    By publishing, you agree to:
-                  </p>
-                  <ul className="list-disc list-inside space-y-1 ml-2">
-                    <li>xStream&apos;s Terms of Service and Creator Guidelines</li>
-                    <li>
-                      Instant settlement of viewer payments to your connected
-                      wallet
-                    </li>
-                    <li>Quality-based pricing as configured above</li>
-                    <li>Platform fee of 5% on all viewer payments</li>
-                    <li>
-                      Content ownership and responsibility for uploaded material
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              {isUploading && (
-                <div className="bg-white/[0.02] p-4 rounded-lg border border-white/10 backdrop-blur-xl">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-white font-light">
-                      Processing video...
-                    </span>
-                    <span className="text-sm text-white font-light">
-                      {uploadProgress}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
-                    <div
-                      className="bg-white h-3 rounded-full transition-all duration-300 relative"
-                      style={{ width: `${uploadProgress}%` }}
-                    >
-                      <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-white/70 mt-2 flex items-center font-light">
-                    <RotateCw className="h-3 w-3 mr-2 animate-spin" />
-                    {uploadProgress < 10 && "Uploading video file..."}
-                    {uploadProgress >= 10 &&
-                      uploadProgress < 90 &&
-                      "Processing with FFmpeg and creating HLS segments..."}
-                    {uploadProgress >= 90 &&
-                      uploadProgress < 95 &&
-                      "Uploading segments to MinIO..."}
-                    {uploadProgress >= 95 && "Finalizing upload..."}
-                  </p>
-                </div>
-              )}
-
-              {/* Error Message */}
-              {error && (
-                <div className="bg-white/[0.02] p-4 rounded-lg border border-white/10 backdrop-blur-xl">
-                  <div className="flex items-start space-x-2">
-                    <AlertCircle className="h-5 w-5 text-white/70 mt-0.5 flex-shrink-0" />
-                    <div className="flex-1">
-                      <h4 className="font-light text-white mb-1">
-                        Upload Failed
-                      </h4>
-                      <p className="text-sm text-white/70 font-light">{error}</p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => seterror(null)}
-                        className="mt-3"
-                      >
-                        Dismiss
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Wallet Connection Notice */}
-              {!isConnected && (
-                <div className="bg-white/[0.02] p-4 rounded-lg border border-white/10 backdrop-blur-xl">
-                  <div className="flex items-start space-x-2">
-                    <AlertCircle className="h-5 w-5 text-white/70 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-light text-white mb-1">
-                        Wallet Not Connected
-                      </h4>
-                      <p className="text-sm text-white/70 font-light">
-                        Please connect your wallet to publish your video and
-                        receive payments.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex justify-between pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setUploadStep(3)}
-                  disabled={isUploading}
-                >
-                  Back
-                </Button>
-                <Button
-                  onClick={handleSubmit}
-                  disabled={isUploading || !isConnected}
-                  className="min-w-[200px]"
-                >
-                  {isUploading ? (
-                    <>
-                      <RotateCw className="h-4 w-4 mr-2 animate-spin" />
-                      Publishing...
-                    </>
-                  ) : !isConnected ? (
-                    <>Connect Wallet to Publish</>
-                  ) : (
-                    <>
-                      <Zap className="h-4 w-4 mr-2" />
-                      Publish Video
-                    </>
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         )}
 
         {/* Step 5: Success Message */}
