@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const description = formData.get('description') as string;
     const category = formData.get('category') as string;
     const tags = formData.get('tags') as string;
-    const walletAddress = formData.get('walletAddress') as string | null;
+    const creatorWallet = formData.get('creatorWallet') as string | null;
 
     if (!videoFile || !title || !description || !category) {
       return NextResponse.json(
@@ -25,24 +25,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let user = null;
-    if (walletAddress) {
-      user = await prisma.user.findUnique({
-        where: { walletAddress }
-      });
-      
-      if (!user) {
-        user = await prisma.user.create({
-          data: { 
-            walletAddress,
-            username: walletAddress.slice(0, 10)
-          }
-        });
-      }
+    if (!creatorWallet) {
+      return NextResponse.json(
+        { error: 'Creator wallet address is required' },
+        { status: 400 }
+      );
     }
 
+    let user = await prisma.user.findUnique({
+      where: { walletAddress: creatorWallet }
+    });
+    
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      user = await prisma.user.create({
+        data: { 
+          walletAddress: creatorWallet,
+          username: creatorWallet.slice(0, 10)
+        }
+      });
     }
 
     const videoBuffer = Buffer.from(await videoFile.arrayBuffer());
