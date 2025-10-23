@@ -11,9 +11,9 @@ export const userService = {
     profileImage?: string
   }) {
     return await prisma.user.upsert({
-      where: { walletAddress: walletAddress.toLowerCase() },
+      where: { walletAddress: walletAddress },
       create: {
-        walletAddress: walletAddress.toLowerCase(),
+        walletAddress: walletAddress,
         ...data
       },
       update: data || {}
@@ -23,14 +23,14 @@ export const userService = {
   // Find user by wallet
   async findByWallet(walletAddress: string) {
     return await prisma.user.findUnique({
-      where: { walletAddress: walletAddress.toLowerCase() }
+      where: { walletAddress: walletAddress }
     })
   },
 
   // Get user with stats
   async getUserWithStats(walletAddress: string) {
     const user = await prisma.user.findUnique({
-      where: { walletAddress: walletAddress.toLowerCase() },
+      where: { walletAddress: walletAddress },
       include: {
         videos: {
           select: {
@@ -92,7 +92,7 @@ export const videoService = {
     creatorWallet: string
   }) {
     // Normalize wallet address to lowercase for consistency
-    const normalizedWallet = data.creatorWallet.toLowerCase();
+    const normalizedWallet = data.creatorWallet;
     console.log("Creating video with creatorWallet:", normalizedWallet);
     
     // First, ensure the user exists

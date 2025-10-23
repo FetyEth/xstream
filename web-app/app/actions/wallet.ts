@@ -53,23 +53,14 @@ export async function depositToWallet(
       throw new Error(settled.errorReason || "Payment settlement failed");
     }
 
-    // Get or create user
+    // Get user
     let user = await prisma.user.findUnique({
       where: { walletAddress },
     });
 
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          walletAddress,
-          username: walletAddress.slice(0, 10),
-          walletBalance: 0,
-        },
-      });
-    }
 
     // Ensure user has walletBalance field (for existing users created before wallet feature)
-    if (user.walletBalance === null || user.walletBalance === undefined) {
+    if (user?.walletBalance === null || user?.walletBalance === undefined) {
       user = await prisma.user.update({
         where: { walletAddress },
         data: {

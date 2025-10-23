@@ -145,11 +145,11 @@ export default function ProfilePage() {
     const getTransactionIcon = (type: string) => {
         switch (type) {
             case "DEPOSIT":
-                return <ArrowDownToLine className="h-4 w-4 text-green-400" />;
+                return <ArrowDownToLine className="h-4 w-4 text-white" />;
             case "STAKE":
-                return <DollarSign className="h-4 w-4 text-blue-400" />;
+                return <DollarSign className="h-4 w-4 text-white" />;
             case "REFUND":
-                return <ArrowUpFromLine className="h-4 w-4 text-purple-400" />;
+                return <ArrowUpFromLine className="h-4 w-4 text-white" />;
             default:
                 return <DollarSign className="h-4 w-4 text-white/50" />;
         }
@@ -252,9 +252,9 @@ export default function ProfilePage() {
                                         </div>
                                     )}
                                     {usdcBalance && parseFloat(usdcBalance.formatted) > 0 && (
-                                        <div className="bg-blue-500/10 px-4 py-2 rounded-lg border border-blue-500/20">
+                                        <div className="bg-white/10 px-4 py-2 rounded-lg border border-white/20">
                                             <div className="flex items-center gap-2">
-                                                <span className="text-xs text-blue-400 font-medium">USDC</span>
+                                                <span className="text-xs text-white font-medium">USDC</span>
                                                 <span className="text-white font-light">
                                                     {parseFloat(usdcBalance.formatted).toFixed(2)}
                                                 </span>
@@ -290,7 +290,7 @@ export default function ProfilePage() {
                 {/* Wallet Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                     {/* Balance Card */}
-                    <Card className="lg:col-span-2 bg-gradient-to-br from-blue-600 to-blue-800 border-blue-500/20">
+                    <Card className="lg:col-span-2 bg-linear-to-br from-white/15 to-white/10 border-white/10 backdrop-blur-sm">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2 text-white">
                                 <Wallet className="h-5 w-5" />
@@ -339,7 +339,7 @@ export default function ProfilePage() {
                                                 .toFixed(2)}
                                         </p>
                                     </div>
-                                    <TrendingUp className="h-8 w-8 text-green-400" />
+                                    <TrendingUp className="h-8 w-8 text-white" />
                                 </div>
                             </CardContent>
                         </Card>
@@ -357,7 +357,7 @@ export default function ProfilePage() {
                                                 .toFixed(2)}
                                         </p>
                                     </div>
-                                    <TrendingDown className="h-8 w-8 text-blue-400" />
+                                    <TrendingDown className="h-8 w-8 text-white" />
                                 </div>
                             </CardContent>
                         </Card>
@@ -398,19 +398,7 @@ export default function ProfilePage() {
                                                 {getTransactionIcon(tx.type)}
                                             </div>
                                             <div>
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <Badge
-                                                        variant="outline"
-                                                        className={`${
-                                                            tx.type === "DEPOSIT"
-                                                                ? "bg-green-500/20 text-green-400 border-green-500/30"
-                                                                : tx.type === "STAKE"
-                                                                ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
-                                                                : "bg-purple-500/20 text-purple-400 border-purple-500/30"
-                                                        }`}
-                                                    >
-                                                        {tx.type}
-                                                    </Badge>
+                                                <div className="flex items-center gap-2">
                                                 </div>
                                                 <p className="text-sm text-white/70">
                                                     {tx.description || "No description"}
@@ -443,11 +431,11 @@ export default function ProfilePage() {
                 </Card>
 
                 {/* Info Card */}
-                <Card className="mt-6 bg-blue-500/10 border-blue-500/20">
+                <Card className="mt-6 bg-white/5 border-white/10 backdrop-blur-sm">
                     <CardContent className="p-6">
                         <div className="flex gap-4">
-                            <div className="p-3 rounded-lg bg-blue-500/20">
-                                <Wallet className="h-6 w-6 text-blue-400" />
+                            <div className="p-3 rounded-lg bg-white/5">
+                                <Wallet className="h-6 w-6 text-white" />
                             </div>
                             <div>
                                 <h3 className="text-white font-semibold mb-2">How the Wallet Works</h3>
@@ -456,7 +444,7 @@ export default function ProfilePage() {
                                     <li>• Automatically stake before watching each video</li>
                                     <li>• Pay only for the time you actually watch</li>
                                     <li>• Get instant refunds for unwatched portions</li>
-                                    <li>• No gas fees for video viewing after initial deposit</li>
+                                    <li>• No gas fees</li>
                                 </ul>
                             </div>
                         </div>
