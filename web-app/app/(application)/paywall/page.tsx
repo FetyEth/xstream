@@ -106,7 +106,7 @@ export default function Paywall() {
   const paymentRequirements: PaymentRequirements = {
     scheme: "exact",
     network: "base-sepolia",
-    maxAmountRequired: "10000",
+    maxAmountRequired: "500000",
     resource: "https://example.com",
     description: "Payment for a service",
     mimeType: "text/html",

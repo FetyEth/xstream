@@ -63,7 +63,7 @@ export async function verifyPayment(payload: string): Promise<string> {
   const paymentRequirements: PaymentRequirements = {
     scheme: "exact",
     network: "base-sepolia",
-    maxAmountRequired: "10000",
+    maxAmountRequired: "500000",
     resource: "https://example.com",
     description: "Payment for a service",
     mimeType: "text/html",
@@ -96,7 +96,7 @@ export async function verifyUploadPayment(payload: string): Promise<string> {
   const paymentRequirements: PaymentRequirements = {
     scheme: "exact",
     network: "base-sepolia",
-    maxAmountRequired: "10000", // 0.01 USDC (6 decimals) - reduced for testing
+    maxAmountRequired: "500000", // 0.5 USDC (6 decimals) - reduced for testing
     resource: "http://localhost:3000/upload",
     description: "xStream Upload Fee",
     mimeType: "application/json",

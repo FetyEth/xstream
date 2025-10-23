@@ -8,17 +8,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Loading } from "@/components/ui/loading";
 import { Name } from "@coinbase/onchainkit/identity";
+import { useUser } from "@/app/hooks/useUser";
 import { 
   ThumbsUp, 
-  ThumbsDown, 
-  Share, 
-  Download, 
+  Share,
   Flag, 
   Eye, 
   Calendar,
   DollarSign,
-  Zap,
-  Award,
   Users
 } from "lucide-react";
 import VideoPlayer from "@/components/VideoPlayer";
@@ -26,9 +23,15 @@ import VideoPlayer from "@/components/VideoPlayer";
 export default function WatchPage() {
   const params = useParams();
   const videoId = params.id;
+  const { user } = useUser();
   const [video, setVideo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subscriberCount, setSubscriberCount] = useState(0);
+  const [actionLoading, setActionLoading] = useState(false);
 
   // Fetch video data
   useEffect(() => {
@@ -45,6 +48,7 @@ export default function WatchPage() {
         
         const data = await response.json();
         setVideo(data.video);
+        setLikeCount(data.video.totalLikes || 0);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load video');
       } finally {
@@ -54,6 +58,86 @@ export default function WatchPage() {
 
     fetchVideo();
   }, [videoId]);
+
+  // Fetch like status and subscription status
+  useEffect(() => {
+    async function fetchUserStatus() {
+      if (!user || !videoId || !video) return;
+
+      try {
+        // Check if user liked the video
+        const likeResponse = await fetch(`/api/videos/${videoId}/like?userId=${user.id}`);
+        if (likeResponse.ok) {
+          const likeData = await likeResponse.json();
+          setIsLiked(likeData.liked);
+        }
+
+        // Check if user is subscribed to creator
+        if (video.creator?.walletAddress) {
+          const subResponse = await fetch(
+            `/api/users/${video.creator.walletAddress}/subscribe?userId=${user.id}`
+          );
+          if (subResponse.ok) {
+            const subData = await subResponse.json();
+            setIsSubscribed(subData.subscribed);
+            setSubscriberCount(subData.subscriberCount || 0);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch user status:', err);
+      }
+    }
+
+    fetchUserStatus();
+  }, [user, videoId, video]);
+
+  // Handle like toggle
+  const handleLike = async () => {
+    if (!user || actionLoading) return;
+
+    try {
+      setActionLoading(true);
+      const response = await fetch(`/api/videos/${videoId}/like`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setIsLiked(data.liked);
+        setLikeCount(prev => data.liked ? prev + 1 : prev - 1);
+      }
+    } catch (err) {
+      console.error('Failed to toggle like:', err);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Handle subscribe toggle
+  const handleSubscribe = async () => {
+    if (!user || !video?.creator?.walletAddress || actionLoading) return;
+
+    try {
+      setActionLoading(true);
+      const response = await fetch(`/api/users/${video.creator.walletAddress}/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setIsSubscribed(data.subscribed);
+        setSubscriberCount(prev => data.subscribed ? prev + 1 : prev - 1);
+      }
+    } catch (err) {
+      console.error('Failed to toggle subscription:', err);
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -122,62 +206,39 @@ export default function WatchPage() {
                           <Name address={video.creator?.walletAddress as `0x${string}`} />
                         </h3>
                         <p className="text-sm text-white/50 font-light">
-                          {video.creator?.walletAddress?.slice(0, 6)}...{video.creator?.walletAddress?.slice(-4)}
+                          {subscriberCount.toLocaleString()} subscriber{subscriberCount !== 1 ? 's' : ''}
                         </p>
                       </div>
-                      <Button variant="default" className="ml-4">
-                        Subscribe
+                      <Button 
+                        variant={isSubscribed ? "outline" : "default"} 
+                        className="ml-4"
+                        onClick={handleSubscribe}
+                        disabled={actionLoading || !user || user.walletAddress === video.creator?.walletAddress}
+                      >
+                        {isSubscribed ? "Subscribed" : "Subscribe"}
                       </Button>
                     </div>
 
                     <div className="flex items-center space-x-2">
                       <div className="flex items-center bg-white/[0.02] border border-white/10 rounded-full">
-                        <Button variant="ghost" size="sm" className="rounded-l-full">
-                          <ThumbsUp className="h-4 w-4 mr-1" />
-                          0
-                        </Button>
-                        <div className="w-px h-6 bg-white/10" />
-                        <Button variant="ghost" size="sm" className="rounded-r-full">
-                          <ThumbsDown className="h-4 w-4 mr-1" />
-                          0
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className={`rounded-full ${isLiked ? 'text-white' : ''}`}
+                          onClick={handleLike}
+                          disabled={actionLoading || !user}
+                        >
+                          <ThumbsUp className={`h-4 w-4 mr-1 ${isLiked ? 'fill-current' : ''}`} />
+                          {likeCount.toLocaleString()}
                         </Button>
                       </div>
                       <Button variant="outline" size="sm">
                         <Share className="h-4 w-4 mr-1" />
                         Share
                       </Button>
-                      <Button variant="outline" size="sm">
-                        <Download className="h-4 w-4 mr-1" />
-                        Download
-                      </Button>
                       <Button variant="ghost" size="sm">
                         <Flag className="h-4 w-4" />
                       </Button>
-                    </div>
-                  </div>
-
-                  {/* xStream Features */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-white/[0.02] rounded-md border border-white/10">
-                    <div className="flex items-center space-x-2">
-                      <Zap className="h-5 w-5 text-white/70" />
-                      <div>
-                        <p className="text-sm font-light text-white">Pay per Second</p>
-                        <p className="text-xs text-white/50 font-light">Only pay for what you watch</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <DollarSign className="h-5 w-5 text-white/70" />
-                      <div>
-                        <p className="text-sm font-light text-white">Direct to Creator</p>
-                        <p className="text-xs text-white/50 font-light">${parseFloat(video.totalEarnings || '0').toFixed(2)} earned</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Award className="h-5 w-5 text-white/70" />
-                      <div>
-                        <p className="text-sm font-light text-white">Earn NFT Rewards</p>
-                        <p className="text-xs text-white/50 font-light">Watch to unlock rewards</p>
-                      </div>
                     </div>
                   </div>
 
@@ -209,7 +270,6 @@ export default function WatchPage() {
                 <div className="text-center py-8 text-white/50 font-light">
                   <Users className="h-12 w-12 mx-auto mb-2 opacity-50" />
                   <p>Comments coming soon...</p>
-                  <p className="text-sm">Connect your wallet to leave a comment</p>
                 </div>
               </CardContent>
             </Card>

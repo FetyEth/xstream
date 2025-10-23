@@ -20,6 +20,9 @@ model User {
   videos            Video[]             @relation("UserVideos")
   viewSessions      ViewSession[]
   walletTransactions WalletTransaction[]
+  likes             VideoLike[]
+  subscriptions     Subscription[]      @relation("UserSubscriptions")
+  subscribers       Subscription[]      @relation("CreatorSubscribers")
 
   @@map("users")
 }
@@ -37,12 +40,14 @@ model Video {
   tags           String[]
   totalViews     Int           @default(0)
   totalWatchTime Int           @default(0)
+  totalLikes     Int           @default(0)
   creatorWallet  String
   publishedAt    DateTime      @default(now())
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   creator        User          @relation("UserVideos", fields: [creatorWallet], references: [walletAddress], onDelete: Cascade)
   viewSessions   ViewSession[]
+  likes          VideoLike[]
 
   @@map("videos")
 }
@@ -93,4 +98,28 @@ model WalletTransaction {
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("wallet_transactions")
+}
+
+model VideoLike {
+  id        String   @id @default(cuid())
+  userId    String
+  videoId   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  video     Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, videoId])
+  @@map("video_likes")
+}
+
+model Subscription {
+  id          String   @id @default(cuid())
+  subscriberId String
+  creatorId   String
+  createdAt   DateTime @default(now())
+  subscriber  User     @relation("UserSubscriptions", fields: [subscriberId], references: [id], onDelete: Cascade)
+  creator     User     @relation("CreatorSubscribers", fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@unique([subscriberId, creatorId])
+  @@map("subscriptions")
 }

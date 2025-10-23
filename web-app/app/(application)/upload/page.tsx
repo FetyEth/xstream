@@ -40,7 +40,7 @@ export default function UploadPage() {
   const paymentRequirements: PaymentRequirements = {
     scheme: "exact",
     network: "base-sepolia",
-    maxAmountRequired: "10000", // 0.01 USDC (6 decimals)
+    maxAmountRequired: "500000", // 0.5 USDC (6 decimals)
     resource: "https://xstream.app/upload",
     description: "xStream Upload Fee",
     mimeType: "application/json",
