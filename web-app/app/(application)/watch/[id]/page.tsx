@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loading } from "@/components/ui/loading";
 import { Name } from "@coinbase/onchainkit/identity";
 import { useAccount } from "wagmi";
+import { useUser } from "@/app/hooks/useUser";
 import {
   ThumbsUp,
   ThumbsDown,
@@ -18,6 +19,8 @@ import {
   Eye,
   Calendar,
   DollarSign,
+  Zap,
+  Award,
   Users,
 } from "lucide-react";
 import VideoPlayer from "@/components/VideoPlayer";
