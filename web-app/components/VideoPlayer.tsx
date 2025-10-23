@@ -27,34 +27,205 @@ interface VideoPlayerProps {
     id: string;
     title: string;
     creator: string;
+    creatorWallet: string;
     duration: string;
     pricePerSecond: number;
     maxQuality: string;
     videoUrl?: string;
   };
+  connectedWallet?: {
+    address: string;
+    isConnected: boolean;
+  };
+  onBalanceUpdate?: (newBalance: number) => void;
 }
 
-export default function VideoPlayer({ video }: VideoPlayerProps) {
+export default function VideoPlayer({ video, connectedWallet, onBalanceUpdate }: VideoPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [quality, setQuality] = useState(video.maxQuality);
-  const [showStakeDialog, setShowStakeDialog] = useState(false);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [showPaymentConfirm, setShowPaymentConfirm] = useState(false);
-  const [stakeAmount, setStakeAmount] = useState("");
   const [currentSpent, setCurrentSpent] = useState(0);
-  const [isStaked, setIsStaked] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const [videoSrc, setVideoSrc] = useState<string>("");
   const [loadingUrl, setLoadingUrl] = useState(true);
   const [availableQualities, setAvailableQualities] = useState<string[]>([]);
   const [currentQualityIndex, setCurrentQualityIndex] = useState<number>(-1);
   const [showSettings, setShowSettings] = useState(false);
   
+  // Wallet state - Now using connected wallet
+  const [userBalance, setUserBalance] = useState(0);
+  const [creatorBalance, setCreatorBalance] = useState(0);
+  const [lastSpentAmount, setLastSpentAmount] = useState(0);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [isLoadingBalance, setIsLoadingBalance] = useState(false);
+  
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Get the current user's wallet address
+  const userWalletAddress = connectedWallet?.address;
+  const isWalletConnected = connectedWallet?.isConnected || false;
+
+  // Function to update wallet balances
+  const updateWalletBalances = async (spentAmount: number) => {
+    if (!userWalletAddress) {
+      console.error('❌ No wallet address available for transfer');
+      return;
+    }
+
+    try {
+      // Calculate the difference from last update
+      const chargeAmount = spentAmount - lastSpentAmount;
+      
+      if (chargeAmount > 0) {
+        // Update local state immediately for UI responsiveness
+        const newUserBalance = Math.max(0, userBalance - chargeAmount);
+        const newCreatorBalance = creatorBalance + chargeAmount;
+        
+        setUserBalance(newUserBalance);
+        setCreatorBalance(newCreatorBalance);
+        setLastSpentAmount(spentAmount);
+        
+        // Notify parent component of balance change
+        if (onBalanceUpdate) {
+          onBalanceUpdate(newUserBalance);
+        }
+        
+        // API call to update balances in database
+        const response = await fetch('/api/wallet/transfer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fromWalletAddress: userWalletAddress,
+            toWalletAddress: video.creatorWallet,
+            amount: chargeAmount,
+            videoId: video.id,
+            timestamp: Date.now(),
+            metadata: {
+              quality: quality,
+              pricePerSecond: getCurrentPricePerSecond(),
+              watchTimeSeconds: currentTime
+            }
+          }),
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to update wallet balances');
+        }
+        
+        const result = await response.json();
+        console.log('✅ Wallet balances updated:', result);
+        
+        // Update local state with actual database values
+        setUserBalance(result.fromBalance);
+        setCreatorBalance(result.toBalance);
+        
+        // If user balance is insufficient, pause the video
+        if (result.fromBalance <= 0) {
+          setIsPlaying(false);
+          if (videoRef.current) {
+            videoRef.current.pause();
+          }
+          alert('Insufficient balance. Video paused.');
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error updating wallet balances:', error);
+      
+      // Revert local state on error
+      setUserBalance(userBalance + (spentAmount - lastSpentAmount));
+      setCreatorBalance(creatorBalance - (spentAmount - lastSpentAmount));
+      setLastSpentAmount(lastSpentAmount);
+      
+      // Pause video on payment error
+      setIsPlaying(false);
+      if (videoRef.current) {
+        videoRef.current.pause();
+      }
+      
+      alert(`Payment failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  // Debug logging for wallet connection
+  useEffect(() => {
+    console.log('🎯 VideoPlayer initialized with:');
+    console.log('   Connected wallet:', connectedWallet);
+    console.log('   User wallet address:', userWalletAddress);
+    console.log('   Wallet connected:', isWalletConnected);
+    console.log('   Creator wallet address:', video.creatorWallet);
+  }, [connectedWallet, userWalletAddress, isWalletConnected, video.creatorWallet]);
+
+  // Fetch user data when wallet is connected
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (userWalletAddress && isWalletConnected) {
+        try {
+          setIsLoadingBalance(true);
+          console.log('🔍 Fetching USER data for connected wallet:', userWalletAddress);
+          
+          const response = await fetch(`/api/users/${userWalletAddress}`);
+          console.log('📡 User API Response status:', response.status);
+          
+          if (response.ok) {
+            const userData = await response.json();
+            console.log('✅ VIEWER data received:', userData);
+            setUserProfile(userData);
+            const balance = parseFloat(userData.walletBalance?.toString() || '0');
+            setUserBalance(balance);
+            console.log('💰 VIEWER balance set to:', balance);
+          } else if (response.status === 404) {
+            console.log('⚠️ Viewer not found, creating user...');
+            const createResponse = await fetch('/api/users/create', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                walletAddress: userWalletAddress,
+                initialBalance: 100
+              }),
+            });
+            
+            if (createResponse.ok) {
+              const newUser = await createResponse.json();
+              console.log('✅ Viewer created:', newUser);
+              setUserProfile(newUser);
+              setUserBalance(parseFloat(newUser.walletBalance.toString()));
+            } else {
+              console.error('❌ Failed to create viewer');
+              setUserBalance(0);
+            }
+          } else {
+            const errorText = await response.text();
+            console.error('❌ User API error:', response.status, errorText);
+            setUserBalance(0);
+          }
+        } catch (error) {
+          console.error('❌ Error fetching user data:', error);
+          setUserBalance(0);
+        } finally {
+          setIsLoadingBalance(false);
+        }
+      } else if (!isWalletConnected) {
+        console.log('⚠️ Wallet not connected');
+        setIsLoadingBalance(false);
+        setUserBalance(0);
+        setUserProfile(null);
+      }
+    };
+
+    fetchUserData();
+  }, [userWalletAddress, isWalletConnected]);
 
   // Fetch secure signed URL from backend
   useEffect(() => {
@@ -160,11 +331,9 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
     setCurrentQualityIndex(qualityIndex);
     
     if (qualityIndex === 0) {
-      // Auto quality
       hls.currentLevel = -1;
       console.log('✅ Quality set to Auto');
     } else {
-      // Specific quality (subtract 1 because index 0 is "Auto")
       hls.currentLevel = qualityIndex - 1;
       console.log(`✅ Quality set to ${availableQualities[qualityIndex]}`);
     }
@@ -185,10 +354,21 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
     }
   };
 
-  // Handle play/pause
+  // Handle play/pause - Updated with wallet connection check
   const togglePlayPause = () => {
-    if (!isStaked) {
-      setShowStakeDialog(true);
+    if (!isWalletConnected) {
+      alert('Please connect your wallet to watch videos.');
+      return;
+    }
+
+    if (!isAuthorized) {
+      setShowPaymentDialog(true);
+      return;
+    }
+
+    // Check if user has sufficient balance before playing
+    if (!isPlaying && userBalance <= 0) {
+      alert('Insufficient balance to continue watching.');
       return;
     }
 
@@ -202,19 +382,29 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
     }
   };
 
-  // Handle stake submission
-  const handleStakeSubmit = () => {
-    const totalCost = parseFloat(calculateTotalCost());
-    const userStake = parseFloat(stakeAmount);
-
-    if (userStake >= totalCost) {
-      setIsStaked(true);
-      setShowStakeDialog(false);
-      setShowPaymentConfirm(false);
-      // Here you would integrate with x402 to actually stake the amount
-    } else {
-      alert(`Minimum stake required: $${totalCost}`);
+  // Handle payment authorization - Updated with wallet connection check
+  const handlePaymentAuthorization = () => {
+    if (!isWalletConnected) {
+      alert('Please connect your wallet to authorize payment.');
+      return;
     }
+
+    if (userBalance <= 0) {
+      alert(`Insufficient balance. Your current balance: $${userBalance.toFixed(2)}`);
+      return;
+    }
+
+    // Check if user has enough for at least a few seconds of viewing
+    const minRequiredBalance = getCurrentPricePerSecond() * 10; // 10 seconds minimum
+    if (userBalance < minRequiredBalance) {
+      alert(`Insufficient balance. Minimum required: $${minRequiredBalance.toFixed(4)} for 10 seconds of viewing.`);
+      return;
+    }
+
+    setIsAuthorized(true);
+    setShowPaymentDialog(false);
+    setShowPaymentConfirm(false);
+    console.log('✅ Payment authorized');
   };
 
   // Handle payment confirmation before watching
@@ -223,20 +413,24 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
     togglePlayPause();
   };
 
-  // Update spending based on watch time
+  // Update spending based on watch time and update wallets
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
-    if (isPlaying && isStaked) {
+    if (isPlaying && isAuthorized && isWalletConnected) {
       interval = setInterval(() => {
-        setCurrentSpent(prev => prev + getCurrentPricePerSecond());
+        const newSpent = currentSpent + getCurrentPricePerSecond();
+        setCurrentSpent(newSpent);
+        
+        // Update wallet balances every second
+        updateWalletBalances(newSpent);
       }, 1000);
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isPlaying, isStaked, quality]);
+  }, [isPlaying, isAuthorized, isWalletConnected, quality, currentSpent, userBalance, creatorBalance, lastSpentAmount]);
 
   // Close settings menu when clicking outside
   useEffect(() => {
@@ -251,16 +445,48 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showSettings]);
 
-  // Available quality options (simplified for demo)
-  const qualityOptions = ['4K', '1080p', '720p', '480p', '240p'].filter(q => 
-    getQualityMultiplier(q) <= getQualityMultiplier(video.maxQuality)
-  );
-
   return (
     <div className="space-y-4">
+      {/* Wallet Balance Display - Updated with connection status */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="text-sm font-light">
+                <span className="text-white/50">Your Balance: </span>
+                {!isWalletConnected ? (
+                  <span className="text-red-400">Wallet not connected</span>
+                ) : isLoadingBalance ? (
+                  <span className="text-white/30">Loading...</span>
+                ) : (
+                  <span className={`text-white ${userBalance < 1 ? 'text-red-400' : ''}`}>
+                    ${userBalance.toFixed(4)}
+                  </span>
+                )}
+              </div>
+              <div className="text-sm font-light">
+                <span className="text-white/50">Creator Earnings: </span>
+                <span className="text-green-400">${creatorBalance.toFixed(4)}</span>
+              </div>
+            </div>
+            <div className="text-sm font-light">
+              <span className="text-white/50">Current spend: </span>
+              <span className="text-white">${currentSpent.toFixed(4)}</span>
+            </div>
+          </div>
+          {/* Debug info - Updated with connection status */}
+          <div className="text-xs text-white/30 mt-2">
+            Debug: Connected={isWalletConnected ? 'YES' : 'NO'}, 
+            Viewer={userWalletAddress ? `${userWalletAddress.slice(0,8)}...` : 'N/A'}, 
+            Creator={video.creatorWallet?.slice(0,8)}..., Balance={userBalance}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Video Player */}
       <Card className="overflow-hidden">
         <div ref={containerRef} className="relative aspect-video bg-black">
+          {/* ... existing video loading and error states ... */}
           {loadingUrl && (
             <div className="absolute inset-0 flex items-center justify-center text-white z-[5] bg-black/50 backdrop-blur-sm">
               <div className="text-center">
@@ -269,11 +495,13 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
               </div>
             </div>
           )}
+
           {!loadingUrl && !videoSrc && (
             <div className="absolute inset-0 flex items-center justify-center text-white z-10">
               <p>Failed to load video. Please try again.</p>
             </div>
           )}
+
           {!loadingUrl && videoSrc && (
             <video
               ref={videoRef}
@@ -296,7 +524,7 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
             />
           )}
           
-          {/* Player Controls Overlay */}
+          {/* Player Controls - Same as before */}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent backdrop-blur-sm p-4">
             {/* Progress Bar */}
             <div 
@@ -403,19 +631,28 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
             </div>
           </div>
 
-          {/* Stake Required Overlay */}
-          {!isStaked && (
+          {/* Payment Required Overlay - Updated with wallet connection check */}
+          {(!isAuthorized || !isWalletConnected) && (
             <div className="absolute inset-0 bg-black/75 backdrop-blur-md flex items-center justify-center">
               <Card className="max-w-md w-full mx-4">
                 <CardContent className="p-6 text-center">
                   <Wallet className="h-12 w-12 mx-auto mb-4 text-white" />
-                  <h3 className="text-lg font-light mb-2 text-white">Stake to Watch</h3>
+                  <h3 className="text-lg font-light mb-2 text-white">
+                    {!isWalletConnected ? 'Connect Wallet' : 'Authorize Payment'}
+                  </h3>
                   <p className="text-white/50 mb-4 font-light">
-                    Stake funds to start watching. You&apos;ll only be charged for what you actually watch.
+                    {!isWalletConnected 
+                      ? 'Connect your wallet to start watching videos.'
+                      : 'Authorize payment to start watching. You\'ll be charged based on your actual watch time.'
+                    }
                   </p>
-                  <Button onClick={() => setShowStakeDialog(true)} className="w-full">
+                  <Button 
+                    onClick={() => !isWalletConnected ? alert('Please connect your wallet first.') : setShowPaymentDialog(true)} 
+                    className="w-full"
+                    disabled={!isWalletConnected}
+                  >
                     <DollarSign className="h-4 w-4 mr-2" />
-                    Stake ${calculateTotalCost()}
+                    {!isWalletConnected ? 'Connect Wallet Required' : 'Authorize Payment'}
                   </Button>
                 </CardContent>
               </Card>
@@ -425,19 +662,15 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
       </Card>
 
       {/* Payment Info */}
-      {isStaked && (
+      {isAuthorized && isWalletConnected && (
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Badge variant="secondary" className="bg-white/10 border-white/20 text-white font-light">
                   <CheckCircle className="h-4 w-4 mr-1" />
-                  Staked
+                  Authorized
                 </Badge>
-                <div className="text-sm font-light">
-                  <span className="text-white/50">Current spend: </span>
-                  <span className="text-white">${currentSpent.toFixed(4)}</span>
-                </div>
                 <div className="text-sm font-light">
                   <span className="text-white/50">Rate: </span>
                   <span className="text-white">${getCurrentPricePerSecond().toFixed(4)}/sec</span>
@@ -453,53 +686,73 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
         </Card>
       )}
 
-      {/* Stake Dialog */}
-      <Dialog open={showStakeDialog} onOpenChange={setShowStakeDialog}>
+      {/* Payment Authorization Dialog - Updated with wallet connection check */}
+      <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="font-light">Stake Funds to Watch</DialogTitle>
+            <DialogTitle className="font-light">Authorize Payment</DialogTitle>
             <DialogDescription className="font-light">
-              Stake the maximum amount you&apos;re willing to spend. You&apos;ll only be charged for the time you actually watch.
+              Authorize payment to watch this video. Funds will be deducted from your wallet balance based on actual watch time.
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4">
             <div className="p-4 bg-white/[0.02] backdrop-blur-sm border border-white/10 rounded-lg">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-light text-white/70">Recommended Stake:</span>
+                <span className="text-sm font-light text-white/70">Connected Wallet:</span>
+                <span className="text-sm font-light text-white">
+                  {userWalletAddress ? `${userWalletAddress.slice(0,6)}...${userWalletAddress.slice(-4)}` : 'Not connected'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-light text-white/70">Your Balance:</span>
+                <span className="text-lg font-light text-white">${userBalance.toFixed(4)}</span>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-light text-white/70">Rate per Second:</span>
+                <span className="text-lg font-light text-white">${getCurrentPricePerSecond().toFixed(4)}</span>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-light text-white/70">Est. Full Video Cost:</span>
                 <span className="text-lg font-light text-white">${calculateTotalCost()}</span>
               </div>
               <p className="text-xs text-white/50 font-light">
-                For full video at {quality} quality
+                At {quality} quality • You can pause anytime
               </p>
             </div>
 
-            <div>
-              <label className="block text-sm font-light mb-2 text-white/70">Stake Amount (USD)</label>
-              <Input
-                type="number"
-                placeholder="0.00"
-                value={stakeAmount}
-                onChange={(e) => setStakeAmount(e.target.value)}
-                min={calculateTotalCost()}
-                step="0.01"
-              />
+            <div className="p-4 border border-blue-500/20 bg-blue-500/5 rounded-lg">
+              <div className="flex items-start space-x-3">
+                <AlertCircle className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                <div className="text-sm text-blue-100/90 font-light">
+                  <p className="font-medium mb-1">How Payment Works:</p>
+                  <ul className="space-y-1 text-xs">
+                    <li>• Funds are deducted from your wallet balance in real-time</li>
+                    <li>• You pay only for the time you actually watch</li>
+                    <li>• Video pauses automatically if balance is insufficient</li>
+                    <li>• No upfront payment or staking required</li>
+                  </ul>
+                </div>
+              </div>
             </div>
 
             <div className="text-xs text-white/50 font-light space-y-1">
-              <p>• Minimum stake: ${calculateTotalCost()}</p>
-              <p>• Unused funds will be automatically refunded</p>
-              <p>• Charges are calculated per second watched</p>
+              <p>• Video will pause if your balance reaches $0</p>
+              <p>• Payment is processed every second during playback</p>
+              <p>• Creator earnings are updated in real-time</p>
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowStakeDialog(false)}>
+            <Button variant="outline" onClick={() => setShowPaymentDialog(false)}>
               Cancel
             </Button>
-            <Button onClick={handleStakeSubmit}>
+            <Button 
+              onClick={handlePaymentAuthorization}
+              disabled={!isWalletConnected || userBalance <= 0}
+            >
               <Wallet className="h-4 w-4 mr-2" />
-              Stake ${stakeAmount || calculateTotalCost()}
+              Authorize Payment
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -509,19 +762,19 @@ export default function VideoPlayer({ video }: VideoPlayerProps) {
       <Dialog open={showPaymentConfirm} onOpenChange={setShowPaymentConfirm}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="font-light">Confirm Payment</DialogTitle>
+            <DialogTitle className="font-light">Start Watching</DialogTitle>
             <DialogDescription className="font-light">
-              Starting playback will begin charging ${getCurrentPricePerSecond().toFixed(4)} per second.
+              Starting playback will begin charging ${getCurrentPricePerSecond().toFixed(4)} per second from your wallet balance.
             </DialogDescription>
           </DialogHeader>
           
           <div className="p-4 border border-white/10 bg-white/[0.02] backdrop-blur-sm rounded-lg">
             <div className="flex items-center space-x-2 mb-2">
               <AlertCircle className="h-4 w-4 text-white/70" />
-              <span className="font-light text-white">Payment Authorization</span>
+              <span className="font-light text-white">Payment Active</span>
             </div>
             <p className="text-sm text-white/50 font-light">
-              This video will charge you based on your watch time and selected quality.
+              Your wallet balance will be charged based on your actual watch time and selected quality.
             </p>
           </div>
 
