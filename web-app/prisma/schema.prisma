@@ -8,16 +8,18 @@ datasource db {
 }
 
 model User {
-  id            String           @id @default(cuid())
-  walletAddress String           @unique
-  username      String?
-  displayName   String?
-  profileImage  String?
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  earnings      CreatorEarning[]
-  videos        Video[]          @relation("UserVideos")
-  viewSessions  ViewSession[]
+  id                String              @id @default(cuid())
+  walletAddress     String              @unique
+  username          String?
+  displayName       String?
+  profileImage      String?
+  walletBalance     Decimal             @default(0) @db.Decimal(18, 8)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  earnings          CreatorEarning[]
+  videos            Video[]             @relation("UserVideos")
+  viewSessions      ViewSession[]
+  walletTransactions WalletTransaction[]
 
   @@map("users")
 }
@@ -74,4 +76,21 @@ model CreatorEarning {
   creator   User      @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
   @@map("creator_earnings")
+}
+
+model WalletTransaction {
+  id              String   @id @default(cuid())
+  userId          String
+  type            String   // "DEPOSIT", "STAKE", "REFUND", "WITHDRAWAL"
+  amount          Decimal  @db.Decimal(18, 8)
+  balanceBefore   Decimal  @db.Decimal(18, 8)
+  balanceAfter    Decimal  @db.Decimal(18, 8)
+  description     String?
+  x402PaymentId   String?  // For deposits via x402
+  videoId         String?  // For stakes/refunds related to videos
+  sessionId       String?  // For tracking view sessions
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("wallet_transactions")
 }

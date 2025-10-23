@@ -2,18 +2,30 @@
 
 import { useState, useEffect } from "react";
 import { useAccount, useBalance, useChainId } from "wagmi";
-import { Card, CardContent } from "@/components/ui/card";
+import { getWalletBalance } from "@/app/actions/wallet";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loading } from "@/components/ui/loading";
+import WalletDepositModal from "@/components/WalletDepositModal";
 import {
     Calendar,
     Wallet,
     Edit,
     Share2,
     Copy,
-    Check
+    Check,
+    RefreshCw,
+    TrendingUp,
+    TrendingDown,
+    AlertCircle,
+    Loader2,
+    DollarSign,
+    ArrowDownToLine,
+    ArrowUpFromLine
 } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
 interface UserStats {
     totalEarned: number;
@@ -32,6 +44,14 @@ interface UserData {
     createdAt: string;
     stats: UserStats;
     videos: any[];
+}
+
+interface Transaction {
+    id: string;
+    type: string;
+    amount: string;
+    description: string | null;
+    createdAt: string;
 }
 
 export default function ProfilePage() {
@@ -56,6 +76,11 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
+    
+    // Wallet state
+    const [walletBalance, setWalletBalance] = useState<number>(0);
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [walletLoading, setWalletLoading] = useState(false);
 
     useEffect(() => {
         async function fetchUserData() {
@@ -85,11 +110,48 @@ export default function ProfilePage() {
         fetchUserData();
     }, [address]);
 
+    // Fetch wallet data
+    const fetchWalletData = async () => {
+        if (!address) return;
+
+        setWalletLoading(true);
+        try {
+            const result = await getWalletBalance(address);
+            if (result.success) {
+                setWalletBalance(parseFloat(result.balance || "0"));
+                setTransactions(result.transactions || []);
+            }
+        } catch (error) {
+            console.error("Failed to fetch wallet data:", error);
+        } finally {
+            setWalletLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (isConnected && address) {
+            fetchWalletData();
+        }
+    }, [address, isConnected]);
+
     const handleCopyAddress = () => {
         if (address) {
             navigator.clipboard.writeText(address);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    const getTransactionIcon = (type: string) => {
+        switch (type) {
+            case "DEPOSIT":
+                return <ArrowDownToLine className="h-4 w-4 text-green-400" />;
+            case "STAKE":
+                return <DollarSign className="h-4 w-4 text-blue-400" />;
+            case "REFUND":
+                return <ArrowUpFromLine className="h-4 w-4 text-purple-400" />;
+            default:
+                return <DollarSign className="h-4 w-4 text-white/50" />;
         }
     };
 
@@ -220,6 +282,182 @@ export default function ProfilePage() {
                                 <Button variant="outline" size="sm">
                                     <Share2 className="h-4 w-4" />
                                 </Button>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Wallet Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    {/* Balance Card */}
+                    <Card className="lg:col-span-2 bg-gradient-to-br from-blue-600 to-blue-800 border-blue-500/20">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-white">
+                                <Wallet className="h-5 w-5" />
+                                xStream Wallet Balance
+                            </CardTitle>
+                            <CardDescription className="text-blue-100">
+                                Available for video viewing
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-4">
+                                <div>
+                                    <div className="text-5xl font-bold text-white mb-2">
+                                        ${walletBalance.toFixed(2)}
+                                    </div>
+                                    <div className="text-sm text-blue-100">USDC on Base Sepolia</div>
+                                </div>
+                                <div className="flex gap-3">
+                                    <WalletDepositModal onSuccess={fetchWalletData} />
+                                    <Button
+                                        variant="outline"
+                                        onClick={fetchWalletData}
+                                        disabled={walletLoading}
+                                        className="gap-2 text-white border-white/20 hover:bg-white/10"
+                                    >
+                                        <RefreshCw className={`h-4 w-4 ${walletLoading ? "animate-spin" : ""}`} />
+                                        Refresh
+                                    </Button>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Quick Stats */}
+                    <div className="space-y-4">
+                        <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-white/70 mb-1">Total Deposits</p>
+                                        <p className="text-2xl font-bold text-white">
+                                            $
+                                            {transactions
+                                                .filter((tx) => tx.type === "DEPOSIT")
+                                                .reduce((sum, tx) => sum + parseFloat(tx.amount), 0)
+                                                .toFixed(2)}
+                                        </p>
+                                    </div>
+                                    <TrendingUp className="h-8 w-8 text-green-400" />
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-white/70 mb-1">Total Spent</p>
+                                        <p className="text-2xl font-bold text-white">
+                                            $
+                                            {transactions
+                                                .filter((tx) => tx.type === "STAKE")
+                                                .reduce((sum, tx) => sum + parseFloat(tx.amount), 0)
+                                                .toFixed(2)}
+                                        </p>
+                                    </div>
+                                    <TrendingDown className="h-8 w-8 text-blue-400" />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+
+                {/* Transaction History */}
+                <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+                    <CardHeader>
+                        <CardTitle className="text-white">Transaction History</CardTitle>
+                        <CardDescription className="text-white/70">
+                            Your recent wallet activity
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {walletLoading ? (
+                            <div className="flex items-center justify-center py-12">
+                                <Loader2 className="h-8 w-8 animate-spin text-white/50" />
+                            </div>
+                        ) : transactions.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-12">
+                                <AlertCircle className="h-12 w-12 text-white/30 mb-3" />
+                                <p className="text-white/50 mb-2">No transactions yet</p>
+                                <p className="text-white/30 text-sm mt-1 mb-4">
+                                    Deposit funds to get started
+                                </p>
+                                <WalletDepositModal onSuccess={fetchWalletData} />
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {transactions.map((tx) => (
+                                    <div
+                                        key={tx.id}
+                                        className="flex items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-colors"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="p-2 rounded-lg bg-white/5">
+                                                {getTransactionIcon(tx.type)}
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <Badge
+                                                        variant="outline"
+                                                        className={`${
+                                                            tx.type === "DEPOSIT"
+                                                                ? "bg-green-500/20 text-green-400 border-green-500/30"
+                                                                : tx.type === "STAKE"
+                                                                ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
+                                                                : "bg-purple-500/20 text-purple-400 border-purple-500/30"
+                                                        }`}
+                                                    >
+                                                        {tx.type}
+                                                    </Badge>
+                                                </div>
+                                                <p className="text-sm text-white/70">
+                                                    {tx.description || "No description"}
+                                                </p>
+                                                <p className="text-xs text-white/50 mt-1">
+                                                    {formatDistanceToNow(new Date(tx.createdAt), {
+                                                        addSuffix: true,
+                                                    })}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <p
+                                                className={`text-lg font-semibold ${
+                                                    tx.type === "DEPOSIT" || tx.type === "REFUND"
+                                                        ? "text-green-400"
+                                                        : "text-white"
+                                                }`}
+                                            >
+                                                {tx.type === "DEPOSIT" || tx.type === "REFUND" ? "+" : "-"}$
+                                                {parseFloat(tx.amount).toFixed(4)}
+                                            </p>
+                                            <p className="text-xs text-white/50">USDC</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+
+                {/* Info Card */}
+                <Card className="mt-6 bg-blue-500/10 border-blue-500/20">
+                    <CardContent className="p-6">
+                        <div className="flex gap-4">
+                            <div className="p-3 rounded-lg bg-blue-500/20">
+                                <Wallet className="h-6 w-6 text-blue-400" />
+                            </div>
+                            <div>
+                                <h3 className="text-white font-semibold mb-2">How the Wallet Works</h3>
+                                <ul className="text-sm text-white/70 space-y-1">
+                                    <li>• Deposit USDC once using x402 payment protocol</li>
+                                    <li>• Automatically stake before watching each video</li>
+                                    <li>• Pay only for the time you actually watch</li>
+                                    <li>• Get instant refunds for unwatched portions</li>
+                                    <li>• No gas fees for video viewing after initial deposit</li>
+                                </ul>
                             </div>
                         </div>
                     </CardContent>
