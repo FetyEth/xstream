@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useAccount } from "wagmi";
 import Hls from "hls.js";
-import { getWalletBalance } from "@/app/actions/wallet";
+import { getWalletBalance, stakeForVideo } from "@/app/actions/wallet";
 import { refundUnusedStake } from "@/app/actions/wallet";
 import StakeConfirmationModal from "./StakeConfirmationModal";
 import WalletDepositModal from "./WalletDepositModal";
@@ -25,6 +25,8 @@ export default function VideoPlayerWithStake({ video }: VideoPlayerWithStakeProp
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   
+  console.log("🎬 VideoPlayerWithStake component loaded - NEW VERSION with Start Overlay");
+  
   // Player state
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -42,6 +44,7 @@ export default function VideoPlayerWithStake({ video }: VideoPlayerWithStakeProp
   const [loadingVideo, setLoadingVideo] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showDepositPrompt, setShowDepositPrompt] = useState(false);
+  const [showStartOverlay, setShowStartOverlay] = useState(true);
 
   // Fetch wallet balance
   const fetchBalance = async () => {
@@ -89,6 +92,7 @@ export default function VideoPlayerWithStake({ video }: VideoPlayerWithStakeProp
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
             console.log("HLS manifest loaded");
             setLoadingVideo(false);
+            console.log("Start overlay should show:", showStartOverlay);
           });
 
           hls.on(Hls.Events.ERROR, (event, data) => {
@@ -119,22 +123,57 @@ export default function VideoPlayerWithStake({ video }: VideoPlayerWithStakeProp
     };
   }, [video.id]);
 
-  // Handle play/pause
-  const togglePlayPause = async () => {
-    if (!videoRef.current) return;
-
-    // If not staked, show stake modal first
-    if (!isStaked && !isPlaying) {
-      const maxStake = (video.pricePerSecond * video.duration) / 1000000;
-      
-      if (walletBalance < maxStake) {
-        setShowDepositPrompt(true);
-        return;
-      }
-      
-      setShowStakeModal(true);
+  // Handle start video confirmation
+  const handleStartVideo = async () => {
+    const maxStake = (video.pricePerSecond * video.duration) / 1000000;
+    
+    // Check if sufficient balance
+    if (walletBalance < maxStake) {
+      setShowDepositPrompt(true);
       return;
     }
+    
+    // Auto-stake without modal
+    setLoadingVideo(true);
+    setShowStartOverlay(false);
+    
+    try {
+      const result = await stakeForVideo(
+        address!,
+        video.id,
+        maxStake
+      );
+
+      if (!result.success) {
+        setError(result.error || "Failed to stake");
+        setLoadingVideo(false);
+        setShowStartOverlay(true);
+        return;
+      }
+
+      // Set session and mark as staked
+      setSessionId(result.sessionId!);
+      setIsStaked(true);
+      await fetchBalance(); // Refresh balance
+      
+      // Auto-play video after stake
+      if (videoRef.current) {
+        await videoRef.current.play();
+        setIsPlaying(true);
+      }
+      setLoadingVideo(false);
+    } catch (error) {
+      console.error("Stake error:", error);
+      setError("Failed to stake for video");
+      setLoadingVideo(false);
+      setShowStartOverlay(true);
+      return;
+    }
+  };
+
+  // Handle play/pause
+  const togglePlayPause = async () => {
+    if (!videoRef.current || !isStaked) return;
 
     if (isPlaying) {
       videoRef.current.pause();
@@ -297,6 +336,67 @@ export default function VideoPlayerWithStake({ video }: VideoPlayerWithStakeProp
           </div>
         )}
 
+        {/* Start Video Overlay */}
+        {showStartOverlay && !error && (
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-30">
+            <div className="text-center text-white max-w-md mx-auto p-6">
+              <Play className="h-16 w-16 mx-auto mb-4 text-blue-400" />
+              <h3 className="text-2xl font-bold mb-2">Ready to Watch?</h3>
+              <p className="text-white/70 mb-6">
+                {video.title}
+              </p>
+              
+              {/* Pricing Info */}
+              <div className="bg-white/10 rounded-lg p-4 mb-6 space-y-2 text-left">
+                <div className="flex justify-between text-sm">
+                  <span className="text-white/70">Duration:</span>
+                  <span>{Math.floor(video.duration / 60)}:{String(video.duration % 60).padStart(2, "0")}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-white/70">Price per second:</span>
+                  <span>${(video.pricePerSecond / 1000000).toFixed(6)}</span>
+                </div>
+                <div className="border-t border-white/20 pt-2 mt-2">
+                  <div className="flex justify-between font-semibold">
+                    <span>Total (full video):</span>
+                    <span className="text-blue-400">
+                      ${((video.pricePerSecond * video.duration) / 1000000).toFixed(4)}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex justify-between text-xs text-white/50 mt-2">
+                  <span>Your balance:</span>
+                  <span>${walletBalance.toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => {
+                    setShowStartOverlay(false);
+                    window.history.back();
+                  }}
+                  variant="outline"
+                  className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/20"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleStartVideo}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Start Video
+                </Button>
+              </div>
+
+              <p className="text-xs text-white/50 mt-4">
+                💡 You'll only be charged for what you watch. Unused amount will be refunded automatically.
+              </p>
+            </div>
+          </div>
+        )}
+
         <video
           ref={videoRef}
           className="w-full h-full"
@@ -355,9 +455,14 @@ export default function VideoPlayerWithStake({ video }: VideoPlayerWithStakeProp
 
             <div className="flex items-center gap-3">
               {isStaked && (
-                <span className="text-xs bg-blue-500/20 px-2 py-1 rounded">
-                  Cost: ${currentCost.toFixed(4)} / ${maxCost.toFixed(4)}
-                </span>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="bg-green-500/20 px-2 py-1 rounded border border-green-500/30 text-green-300">
+                    Staked: ${maxCost.toFixed(4)}
+                  </span>
+                  <span className="bg-blue-500/20 px-2 py-1 rounded border border-blue-500/30">
+                    Spent: ${currentCost.toFixed(4)}
+                  </span>
+                </div>
               )}
               
               <Button
