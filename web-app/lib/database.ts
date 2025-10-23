@@ -11,9 +11,9 @@ export const userService = {
     profileImage?: string
   }) {
     return await prisma.user.upsert({
-      where: { walletAddress: walletAddress.toLowerCase() },
+      where: { walletAddress: walletAddress },
       create: {
-        walletAddress: walletAddress.toLowerCase(),
+        walletAddress: walletAddress,
         ...data
       },
       update: data || {}
@@ -23,14 +23,14 @@ export const userService = {
   // Find user by wallet
   async findByWallet(walletAddress: string) {
     return await prisma.user.findUnique({
-      where: { walletAddress: walletAddress.toLowerCase() }
+      where: { walletAddress: walletAddress }
     })
   },
 
   // Get user with stats
   async getUserWithStats(walletAddress: string) {
     const user = await prisma.user.findUnique({
-      where: { walletAddress: walletAddress.toLowerCase() },
+      where: { walletAddress: walletAddress },
       include: {
         videos: {
           select: {
@@ -92,7 +92,7 @@ export const videoService = {
     creatorWallet: string
   }) {
     // Normalize wallet address to lowercase for consistency
-    const normalizedWallet = data.creatorWallet.toLowerCase();
+    const normalizedWallet = data.creatorWallet;
     console.log("Creating video with creatorWallet:", normalizedWallet);
     
     // First, ensure the user exists
@@ -348,5 +348,387 @@ export const earningService = {
         paidAt: new Date()
       }
     })
+  }
+}
+
+// Video Like Operations
+export const likeService = {
+  // Toggle like on a video
+  async toggleLike(userId: string, videoId: string) {
+    const existingLike = await prisma.videoLike.findUnique({
+      where: {
+        userId_videoId: {
+          userId,
+          videoId
+        }
+      }
+    })
+
+    if (existingLike) {
+      // Unlike: delete like and decrement counter
+      await prisma.$transaction([
+        prisma.videoLike.delete({
+          where: {
+            userId_videoId: {
+              userId,
+              videoId
+            }
+          }
+        }),
+        prisma.video.update({
+          where: { id: videoId },
+          data: {
+            totalLikes: {
+              decrement: 1
+            }
+          }
+        })
+      ])
+      return { liked: false }
+    } else {
+      // Like: create like and increment counter
+      await prisma.$transaction([
+        prisma.videoLike.create({
+          data: {
+            userId,
+            videoId
+          }
+        }),
+        prisma.video.update({
+          where: { id: videoId },
+          data: {
+            totalLikes: {
+              increment: 1
+            }
+          }
+        })
+      ])
+      return { liked: true }
+    }
+  },
+
+  // Check if user liked a video
+  async hasUserLiked(userId: string, videoId: string) {
+    const like = await prisma.videoLike.findUnique({
+      where: {
+        userId_videoId: {
+          userId,
+          videoId
+        }
+      }
+    })
+    return !!like
+  },
+
+  // Get user's liked videos
+  async getUserLikedVideos(userId: string, params?: {
+    page?: number
+    limit?: number
+  }) {
+    const page = params?.page || 1
+    const limit = params?.limit || 20
+    const skip = (page - 1) * limit
+
+    const [likes, total] = await Promise.all([
+      prisma.videoLike.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+        include: {
+          video: {
+            include: {
+              creator: {
+                select: {
+                  id: true,
+                  walletAddress: true,
+                  username: true,
+                  displayName: true,
+                  profileImage: true
+                }
+              }
+            }
+          }
+        }
+      }),
+      prisma.videoLike.count({ where: { userId } })
+    ])
+
+    return {
+      videos: likes.map(like => like.video),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    }
+  },
+
+  // Get users who liked a video
+  async getVideoLikes(videoId: string, params?: {
+    page?: number
+    limit?: number
+  }) {
+    const page = params?.page || 1
+    const limit = params?.limit || 20
+    const skip = (page - 1) * limit
+
+    const [likes, total] = await Promise.all([
+      prisma.videoLike.findMany({
+        where: { videoId },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+        include: {
+          user: {
+            select: {
+              id: true,
+              walletAddress: true,
+              username: true,
+              displayName: true,
+              profileImage: true
+            }
+          }
+        }
+      }),
+      prisma.videoLike.count({ where: { videoId } })
+    ])
+
+    return {
+      users: likes.map(like => like.user),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    }
+  }
+}
+
+// Subscription Operations
+export const subscriptionService = {
+  // Toggle subscription to a creator
+  async toggleSubscription(subscriberId: string, creatorId: string) {
+    if (subscriberId === creatorId) {
+      throw new Error('Cannot subscribe to yourself')
+    }
+
+    const existingSubscription = await prisma.subscription.findUnique({
+      where: {
+        subscriberId_creatorId: {
+          subscriberId,
+          creatorId
+        }
+      }
+    })
+
+    if (existingSubscription) {
+      // Unsubscribe
+      await prisma.subscription.delete({
+        where: {
+          subscriberId_creatorId: {
+            subscriberId,
+            creatorId
+          }
+        }
+      })
+      return { subscribed: false }
+    } else {
+      // Subscribe
+      await prisma.subscription.create({
+        data: {
+          subscriberId,
+          creatorId
+        }
+      })
+      return { subscribed: true }
+    }
+  },
+
+  // Check if user is subscribed to creator
+  async isSubscribed(subscriberId: string, creatorId: string) {
+    const subscription = await prisma.subscription.findUnique({
+      where: {
+        subscriberId_creatorId: {
+          subscriberId,
+          creatorId
+        }
+      }
+    })
+    return !!subscription
+  },
+
+  // Get user's subscriptions
+  async getUserSubscriptions(subscriberId: string, params?: {
+    page?: number
+    limit?: number
+  }) {
+    const page = params?.page || 1
+    const limit = params?.limit || 20
+    const skip = (page - 1) * limit
+
+    const [subscriptions, total] = await Promise.all([
+      prisma.subscription.findMany({
+        where: { subscriberId },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+        include: {
+          creator: {
+            select: {
+              id: true,
+              walletAddress: true,
+              username: true,
+              displayName: true,
+              profileImage: true,
+              videos: {
+                select: {
+                  id: true,
+                  totalViews: true
+                }
+              }
+            }
+          }
+        }
+      }),
+      prisma.subscription.count({ where: { subscriberId } })
+    ])
+
+    return {
+      creators: subscriptions.map(sub => ({
+        ...sub.creator,
+        subscribedAt: sub.createdAt,
+        videoCount: sub.creator.videos.length
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    }
+  },
+
+  // Get creator's subscribers
+  async getCreatorSubscribers(creatorId: string, params?: {
+    page?: number
+    limit?: number
+  }) {
+    const page = params?.page || 1
+    const limit = params?.limit || 20
+    const skip = (page - 1) * limit
+
+    const [subscriptions, total] = await Promise.all([
+      prisma.subscription.findMany({
+        where: { creatorId },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+        include: {
+          subscriber: {
+            select: {
+              id: true,
+              walletAddress: true,
+              username: true,
+              displayName: true,
+              profileImage: true
+            }
+          }
+        }
+      }),
+      prisma.subscription.count({ where: { creatorId } })
+    ])
+
+    return {
+      subscribers: subscriptions.map(sub => ({
+        ...sub.subscriber,
+        subscribedAt: sub.createdAt
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    }
+  },
+
+  // Get subscriber count for a creator
+  async getSubscriberCount(creatorId: string) {
+    return await prisma.subscription.count({
+      where: { creatorId }
+    })
+  },
+
+  // Get subscription count for a user
+  async getSubscriptionCount(subscriberId: string) {
+    return await prisma.subscription.count({
+      where: { subscriberId }
+    })
+  },
+
+  // Get videos from subscribed creators
+  async getSubscriptionFeed(subscriberId: string, params?: {
+    page?: number
+    limit?: number
+  }) {
+    const page = params?.page || 1
+    const limit = params?.limit || 20
+    const skip = (page - 1) * limit
+
+    // Get all subscribed creator IDs
+    const subscriptions = await prisma.subscription.findMany({
+      where: { subscriberId },
+      select: { creatorId: true }
+    })
+
+    const creatorIds = subscriptions.map(sub => sub.creatorId)
+
+    const [videos, total] = await Promise.all([
+      prisma.video.findMany({
+        where: {
+          creator: {
+            id: {
+              in: creatorIds
+            }
+          }
+        },
+        orderBy: { publishedAt: 'desc' },
+        skip,
+        take: limit,
+        include: {
+          creator: {
+            select: {
+              id: true,
+              walletAddress: true,
+              username: true,
+              displayName: true,
+              profileImage: true
+            }
+          }
+        }
+      }),
+      prisma.video.count({
+        where: {
+          creator: {
+            id: {
+              in: creatorIds
+            }
+          }
+        }
+      })
+    ])
+
+    return {
+      videos,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    }
   }
 }

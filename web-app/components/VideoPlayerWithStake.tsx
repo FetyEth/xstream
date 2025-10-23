@@ -8,7 +8,7 @@ import { refundUnusedStake } from "@/app/actions/wallet";
 import StakeConfirmationModal from "./StakeConfirmationModal";
 import WalletDepositModal from "./WalletDepositModal";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Volume2, VolumeX, Maximize, Settings, Loader2, Wallet, AlertCircle } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, Loader2, AlertCircle } from "lucide-react";
 
 interface VideoPlayerWithStakeProps {
   video: {
@@ -306,7 +306,6 @@ export default function VideoPlayerWithStake({ video }: VideoPlayerWithStakeProp
     return (
       <div className="relative aspect-video bg-black rounded-lg flex items-center justify-center">
         <div className="text-center text-white">
-          <Wallet className="h-12 w-12 mx-auto mb-4 text-blue-400" />
           <p className="text-lg mb-2">Connect Wallet to Watch</p>
           <p className="text-sm text-white/70">You need to connect your wallet to stake and watch videos</p>
         </div>
@@ -391,7 +390,7 @@ export default function VideoPlayerWithStake({ video }: VideoPlayerWithStakeProp
               </div>
 
               <p className="text-xs text-white/50 mt-4">
-                💡 You'll only be charged for what you watch. Unused amount will be refunded automatically.
+                💡 You&apos;ll only be charged for what you watch. Unused amount will be refunded automatically.
               </p>
             </div>
           </div>

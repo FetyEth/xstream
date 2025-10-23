@@ -46,7 +46,9 @@ export default function VideoCard({ video }: VideoCardProps) {
     return (price * totalSeconds).toFixed(2);
   };
 
-  const thumbnailUrl = video.thumbnailUrl || video.thumbnail || '';
+  const thumbnailUrl = (video.thumbnailUrl || video.thumbnail) 
+    ? `/api/videos/${video.id}/thumbnail` 
+    : '';
   const viewCount = video.totalViews ?? video.views ?? 0;
   const uploadDate = video.publishedAt 
     ? formatRelativeTime(video.publishedAt)
@@ -63,7 +65,7 @@ export default function VideoCard({ video }: VideoCardProps) {
     <Card className="group">
       <div className="relative">
         {/* Thumbnail */}
-        <div className="relative aspect-video bg-white/[0.02] overflow-hidden">
+        <div className="relative aspect-video bg-white/2 overflow-hidden">
           {thumbnailUrl ? (
             <img
               src={thumbnailUrl}

@@ -84,8 +84,11 @@ function VideoCard({ video }: { video: any }) {
   };
 
   const getThumbnail = () => {
-    return video.thumbnail || video.thumbnailUrl || 
-           "/logo.png";
+    // Use proxy route for all thumbnails to handle S3 authentication
+    if (video.thumbnailUrl || video.thumbnail) {
+      return `/api/videos/${video.id}/thumbnail`;
+    }
+    return "/logo.png";
   };
 
   const getViews = () => {
@@ -105,16 +108,16 @@ function VideoCard({ video }: { video: any }) {
   return (
     <Link href={`/watch/${video.id}`}>
       <Card className="group overflow-hidden cursor-pointer">
-        <div className="relative aspect-video overflow-hidden bg-white/[0.02]">
+        <div className="relative aspect-video overflow-hidden bg-white/2">
           <img 
             src={getThumbnail()}
             alt={video.title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             onError={(e) => {
-              e.currentTarget.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ9IjM2MCIgdmlld0JveD0iMCAwIDY0MCAzNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI2NDAiIGhlaWdodD0iMzYwIiBmaWxsPSIjMUExQTFBIi8+CjxwYXRoIGQ9Ik0yODAgMTYwQzI4MCAxNDguOTU0IDI4OC45NTQgMTQwIDMwMCAxNDBIMzQwQzM1MS4wNDYgMTQwIDM2MCAxNDguOTU0IDM2MCAxNjBWMjAwQzM2MCAyMTEuMDQ2IDM1MS4wNDYgMjIwIDM0MCAyMjBIMzAwQzI4OC45NTQgMjIwIDI4MCAyMTEuMDQ2IDI4MCAyMDBWMTYwWiIgZmlsbD0iIzRBNEE0QSIvPgo8cGF0aCBkPSJNMzIwIDE5MFYxNzBMMzQwIDE4MEwzMjAgMTkwWiIgZmlsbD0iIzFBMUExQSIvPgo8L3N2Zz4=";
+              e.currentTarget.src = '/logo.png';
             }}
           />
-          <div className="absolute bottom-2 right-2 bg-black/75 backdrop-blur-sm px-2 py-1 rounded text-xs text-white font-light">{video.duration}</div>
+          <div className="absolute bottom-2 right-2 bg-black/75 backdrop-blur-sm px-2 py-1 rounded text-xs text-white font-light">{video.duration}s</div>
         </div>
         <div className="p-4">
           <div className="flex items-start justify-between gap-2 mb-2">

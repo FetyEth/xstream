@@ -28,8 +28,6 @@ export default function UploadPage() {
   const [tags, setTags] = useState("");
   const [pricePerSecond, setPricePerSecond] = useState("0.01");
   const [maxQuality, setMaxQuality] = useState("1080p");
-  const [thumbnail, setThumbnail] = useState<File | null>(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -40,7 +38,7 @@ export default function UploadPage() {
   const paymentRequirements: PaymentRequirements = {
     scheme: "exact",
     network: "base-sepolia",
-    maxAmountRequired: "10000", // 0.01 USDC (6 decimals)
+    maxAmountRequired: "500000", // 0.5 USDC (6 decimals)
     resource: "https://xstream.app/upload",
     description: "xStream Upload Fee",
     mimeType: "application/json",
@@ -79,25 +77,6 @@ export default function UploadPage() {
       setUploadError(null);
       setUploadStep(2);
     }
-  };
-
-  const handleThumbnailUpload = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setThumbnail(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setThumbnailPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const removeThumbnail = () => {
-    setThumbnail(null);
-    setThumbnailPreview(null);
   };
 
   const handleSubmit = async () => {
@@ -192,10 +171,6 @@ export default function UploadPage() {
       formData.append("category", category);
       formData.append("tags", tags);
       formData.append("creatorWallet", address);
-
-      if (thumbnail) {
-        formData.append("thumbnail", thumbnail);
-      }
       console.log("Creator wallet address:", address);
 
       setUploadProgress(30);
@@ -252,8 +227,6 @@ export default function UploadPage() {
     setTags("");
     setPricePerSecond("0.01");
     setMaxQuality("1080p");
-    setThumbnail(null);
-    setThumbnailPreview(null);
     setUploadError(null);
     setUploadProgress(0);
     setUploadedVideoUrl("");
@@ -298,13 +271,10 @@ export default function UploadPage() {
             description={description}
             category={category}
             tags={tags}
-            thumbnailPreview={thumbnailPreview}
             onTitleChange={setTitle}
             onDescriptionChange={setDescription}
             onCategoryChange={setCategory}
             onTagsChange={setTags}
-            onThumbnailUpload={handleThumbnailUpload}
-            onRemoveThumbnail={removeThumbnail}
             onBack={() => setUploadStep(1)}
             onNext={() => setUploadStep(3)}
             formatFileSize={formatFileSize}

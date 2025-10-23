@@ -2,8 +2,7 @@
 
 import { 
   Home, 
-  TrendingUp, 
-  Clock, 
+  TrendingUp,
   ThumbsUp, 
   Heart, 
   History, 
@@ -11,7 +10,8 @@ import {
   Upload,
   ChevronLeft,
   ChevronRight,
-  DollarSignIcon
+  DollarSignIcon,
+  Users
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -26,14 +26,13 @@ const navigationItems = [
 
 const libraryItems = [
   { icon: History, label: "History", href: "/history" },
-  { icon: Clock, label: "Watch Later", href: "/watch-later" },
   { icon: ThumbsUp, label: "Liked Videos", href: "/liked" },
-  { icon: Heart, label: "Favorites", href: "/favorites" },
+  { icon: Users, label: "Subscriptions", href: "/subscriptions" },
 ];
 
 const creatorItems = [
   { icon: Upload, label: "Upload Video", href: "/upload" },
-  { icon: DollarSignIcon, label: "Advertise", href: "/advertise" }
+  // { icon: DollarSignIcon, label: "Advertise", href: "/advertise" }
 ];
 
 export default function Sidebar() {

@@ -48,10 +48,6 @@ export default function Header() {
   const getNetworkColor = (chainId: number | undefined) => {
     if (!chainId) return "text-white/50";
     switch (chainId) {
-      case 8453:
-        return "text-blue-400";
-      case 84532:
-        return "text-purple-400";
       default:
         return "text-white/50";
     }
@@ -96,34 +92,17 @@ export default function Header() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-white/10" />
                 <DropdownMenuItem
-                  onClick={() => switchChain({ chainId: base.id })}
-                  className={`cursor-pointer hover:bg-white/10 ${
-                    chain?.id === 8453 ? "bg-blue-500/20 text-blue-400" : ""
-                  }`}
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-blue-400"></div>
-                      <span>Base Mainnet</span>
-                    </div>
-                    {chain?.id === 8453 && (
-                      <span className="text-xs text-blue-400">✓</span>
-                    )}
-                  </div>
-                </DropdownMenuItem>
-                <DropdownMenuItem
                   onClick={() => switchChain({ chainId: baseSepolia.id })}
                   className={`cursor-pointer hover:bg-white/10 ${
-                    chain?.id === 84532 ? "bg-purple-500/20 text-purple-400" : ""
+                    chain?.id === 84532 ? "bg-white/20 text-white" : ""
                   }`}
                 >
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-purple-400"></div>
                       <span>Base Sepolia</span>
                     </div>
                     {chain?.id === 84532 && (
-                      <span className="text-xs text-purple-400">✓</span>
+                      <span className="text-xs text-white">✓</span>
                     )}
                   </div>
                 </DropdownMenuItem>

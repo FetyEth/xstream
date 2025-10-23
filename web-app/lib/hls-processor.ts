@@ -29,6 +29,7 @@ export interface HLSUploadResult {
   masterPlaylistUrl: string;
   qualities: string[];
   duration: number;
+  thumbnailUrl: string;
 }
 
 /**
@@ -52,6 +53,22 @@ export async function processAndUploadHLS(
     // Get video info
     const videoInfo = await getVideoInfo(inputPath);
     console.log(`📹 Video info: ${videoInfo.width}x${videoInfo.height}, ${videoInfo.duration}s`);
+
+    // Extract first frame as thumbnail
+    console.log('📸 Extracting thumbnail from first frame...');
+    const thumbnailPath = path.join(tempDir, 'thumbnail.jpg');
+    await extractThumbnail(inputPath, thumbnailPath);
+    
+    // Upload thumbnail to S3
+    const thumbnailBuffer = await readFile(thumbnailPath);
+    const thumbnailKey = `videos/${videoId}/thumbnail.jpg`;
+    await storageService.uploadHLSFile(
+      thumbnailBuffer,
+      thumbnailKey,
+      'image/jpeg'
+    );
+    const thumbnailUrl = storageService.getPublicUrl(thumbnailKey);
+    console.log('✅ Thumbnail uploaded');
 
     // Filter qualities based on source resolution
     const availableQualities = DEFAULT_QUALITIES.filter(
@@ -147,6 +164,7 @@ export async function processAndUploadHLS(
       masterPlaylistUrl,
       qualities: processedQualities,
       duration: videoInfo.duration,
+      thumbnailUrl,
     };
   } finally {
     // Cleanup temp files
@@ -188,6 +206,30 @@ function generateMasterPlaylist(videoId: string, qualities: string[]): string {
   }
 
   return content;
+}
+
+/**
+ * Extract first frame as thumbnail
+ */
+function extractThumbnail(inputPath: string, outputPath: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    ffmpeg(inputPath)
+      .screenshots({
+        count: 1,
+        folder: path.dirname(outputPath),
+        filename: path.basename(outputPath),
+        timestamps: ['00:00:01'], // Extract at 1 second to avoid black frames
+        size: '1280x720'
+      })
+      .on('end', () => {
+        console.log('✅ Thumbnail extracted');
+        resolve();
+      })
+      .on('error', (err: any) => {
+        console.error('❌ Thumbnail extraction error:', err);
+        reject(err);
+      });
+  });
 }
 
 /**

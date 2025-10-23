@@ -18,8 +18,6 @@ import {
   Eye,
   Calendar,
   DollarSign,
-  Zap,
-  Award,
   Users,
 } from "lucide-react";
 import VideoPlayer from "@/components/VideoPlayer";
@@ -27,10 +25,16 @@ import VideoPlayer from "@/components/VideoPlayer";
 export default function WatchPage() {
   const params = useParams();
   const videoId = params.id;
+  const { user } = useUser();
   const [video, setVideo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { address, isConnected } = useAccount();
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subscriberCount, setSubscriberCount] = useState(0);
+  const [actionLoading, setActionLoading] = useState(false);
 
   // Fetch video data
   useEffect(() => {
@@ -47,6 +51,7 @@ export default function WatchPage() {
 
         const data = await response.json();
         setVideo(data.video);
+        setLikeCount(data.video.totalLikes || 0);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load video");
       } finally {
@@ -56,6 +61,86 @@ export default function WatchPage() {
 
     fetchVideo();
   }, [videoId]);
+
+  // Fetch like status and subscription status
+  useEffect(() => {
+    async function fetchUserStatus() {
+      if (!user || !videoId || !video) return;
+
+      try {
+        // Check if user liked the video
+        const likeResponse = await fetch(`/api/videos/${videoId}/like?userId=${user.id}`);
+        if (likeResponse.ok) {
+          const likeData = await likeResponse.json();
+          setIsLiked(likeData.liked);
+        }
+
+        // Check if user is subscribed to creator
+        if (video.creator?.walletAddress) {
+          const subResponse = await fetch(
+            `/api/users/${video.creator.walletAddress}/subscribe?userId=${user.id}`
+          );
+          if (subResponse.ok) {
+            const subData = await subResponse.json();
+            setIsSubscribed(subData.subscribed);
+            setSubscriberCount(subData.subscriberCount || 0);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch user status:', err);
+      }
+    }
+
+    fetchUserStatus();
+  }, [user, videoId, video]);
+
+  // Handle like toggle
+  const handleLike = async () => {
+    if (!user || actionLoading) return;
+
+    try {
+      setActionLoading(true);
+      const response = await fetch(`/api/videos/${videoId}/like`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setIsLiked(data.liked);
+        setLikeCount(prev => data.liked ? prev + 1 : prev - 1);
+      }
+    } catch (err) {
+      console.error('Failed to toggle like:', err);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Handle subscribe toggle
+  const handleSubscribe = async () => {
+    if (!user || !video?.creator?.walletAddress || actionLoading) return;
+
+    try {
+      setActionLoading(true);
+      const response = await fetch(`/api/users/${video.creator.walletAddress}/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setIsSubscribed(data.subscribed);
+        setSubscriberCount(prev => data.subscribed ? prev + 1 : prev - 1);
+      }
+    } catch (err) {
+      console.error('Failed to toggle subscription:', err);
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   if (loading) {
     return (
