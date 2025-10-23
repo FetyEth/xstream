@@ -166,11 +166,14 @@ export default function HistoryPage() {
                 <CardContent className="p-4">
                   <div className="flex space-x-4">
                     {/* Thumbnail */}
-                    <div className="relative flex-shrink-0 w-48 h-27 bg-white/[0.02] rounded-lg overflow-hidden">
+                    <div className="relative flex-shrink-0 w-48 h-27 bg-white/2 rounded-lg overflow-hidden">
                       <img
-                        src={item.video.thumbnailUrl}
+                        src={`/api/videos/${item.video.id}/thumbnail`}
                         alt={item.video.title}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = '/logo.png';
+                        }}
                       />
                       <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded text-xs text-white">
                         {formatDuration(item.video.duration)}

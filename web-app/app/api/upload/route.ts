@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { storageService } from '@/lib/storage';
 import { prisma } from '@/lib/prisma';
 import { processAndUploadHLS } from '@/lib/hls-processor';
 
@@ -11,14 +10,22 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const videoFile = formData.get('video') as File;
-    const thumbnailFile = formData.get('thumbnail') as File | null;
     const title = formData.get('title') as string;
     const description = formData.get('description') as string;
     const category = formData.get('category') as string;
     const tags = formData.get('tags') as string;
     const creatorWallet = formData.get('creatorWallet') as string | null;
 
-    if (!videoFile || !title || !description || !category) {
+    console.log('Upload request data:', {
+      hasVideo: !!videoFile,
+      title,
+      description,
+      category,
+      tags,
+      creatorWallet
+    });
+
+    if (!videoFile || !title || !category) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -54,18 +61,8 @@ export async function POST(request: NextRequest) {
     const hlsResult = await processAndUploadHLS(videoBuffer, videoId);
     console.log('✅ HLS processing complete:', hlsResult);
 
-    // Upload thumbnail
-    let thumbnailUrl = '';
-    if (thumbnailFile) {
-      const thumbnailBuffer = Buffer.from(await thumbnailFile.arrayBuffer());
-      const thumbnailFilename = `${Date.now()}-thumb-${thumbnailFile.name.replace(/\s+/g, '-')}`;
-      const thumbnailUpload = await storageService.uploadThumbnail(
-        thumbnailBuffer,
-        thumbnailFilename,
-        thumbnailFile.type
-      );
-      thumbnailUrl = thumbnailUpload.publicUrl;
-    }
+    // Use the thumbnail URL from HLS processing (extracted from first frame)
+    const thumbnailUrl = hlsResult.thumbnailUrl || '';
 
     const video = await prisma.video.create({
       data: {

@@ -5,7 +5,6 @@ import { useAccount, useBalance, useChainId } from "wagmi";
 import { getWalletBalance } from "@/app/actions/wallet";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loading } from "@/components/ui/loading";
 import WalletDepositModal from "@/components/WalletDepositModal";
@@ -23,7 +22,8 @@ import {
     Loader2,
     DollarSign,
     ArrowDownToLine,
-    ArrowUpFromLine
+    ArrowUpFromLine,
+    Droplet
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -318,6 +318,14 @@ export default function ProfilePage() {
                                     >
                                         <RefreshCw className={`h-4 w-4 ${walletLoading ? "animate-spin" : ""}`} />
                                         Refresh
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => window.open('https://faucet.circle.com/', '_blank')}
+                                        className="gap-2 text-white border-white/20 hover:bg-white/10"
+                                    >
+                                        <Droplet className="h-4 w-4" />
+                                        Get USDC
                                     </Button>
                                 </div>
                             </div>
