@@ -21,8 +21,7 @@ export async function GET(
       );
     }
 
-    // If it's an external URL (like Unsplash), redirect directly
-    if (video.thumbnailUrl.startsWith('http://') || video.thumbnailUrl.startsWith('https://')) {
+    if (!video.thumbnailUrl.startsWith(process.env.NEXT_PUBLIC_S3_PUBLIC_URL!)) {
       return NextResponse.redirect(video.thumbnailUrl);
     }
 
