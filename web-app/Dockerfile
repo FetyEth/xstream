@@ -19,6 +19,15 @@ COPY . .
 # Generate Prisma Client
 RUN npx prisma generate
 
+# Build arguments for Next.js public env vars
+ARG NEXT_PUBLIC_ONCHAINKIT_API_KEY
+ARG NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
+ARG NEXT_PUBLIC_S3_PUBLIC_URL
+
+ENV NEXT_PUBLIC_ONCHAINKIT_API_KEY=${NEXT_PUBLIC_ONCHAINKIT_API_KEY}
+ENV NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=${NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID}
+ENV NEXT_PUBLIC_S3_PUBLIC_URL=${NEXT_PUBLIC_S3_PUBLIC_URL}
+
 # Disable telemetry during build
 ENV NEXT_TELEMETRY_DISABLED=1
 
@@ -28,6 +37,9 @@ RUN npm run build
 # Stage 3: Runner
 FROM node:20-alpine AS runner
 WORKDIR /app
+
+# Install FFmpeg (includes ffprobe)
+RUN apk add --no-cache ffmpeg
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
