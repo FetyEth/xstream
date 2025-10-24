@@ -45,6 +45,7 @@ interface UserData {
     profileImage?: string;
     createdAt: string;
     stats: UserStats;
+    walletBalance?: number | string;
     videos: any[];
 }
 
@@ -94,7 +95,7 @@ export default function ProfilePage() {
             try {
                 setLoading(true);
                 // Normalize address to lowercase for consistency
-                const normalizedAddress = address.toLowerCase();
+                const normalizedAddress = address;
                 const response = await fetch(`/api/users/${normalizedAddress}/stats`, {
                     cache: 'no-store', // Disable caching to get fresh data
                 });
@@ -138,7 +139,7 @@ export default function ProfilePage() {
         
         try {
             // Normalize address to lowercase for consistency
-            const normalizedAddress = address.toLowerCase();
+            const normalizedAddress = address;
             
             // Fetch user stats
             const statsResponse = await fetch(`/api/users/${normalizedAddress}/stats`, {
@@ -172,7 +173,7 @@ export default function ProfilePage() {
 
         setWalletLoading(true);
         try {
-            const normalizedAddress = address.toLowerCase();
+            const normalizedAddress = address;
             const result = await getWalletBalance(normalizedAddress);
             if (result.success) {
                 setTransactions(result.transactions || []);
@@ -201,13 +202,13 @@ export default function ProfilePage() {
     const getTransactionIcon = (type: string) => {
         switch (type) {
             case "DEPOSIT":
-                return <ArrowDownToLine className="h-4 w-4 text-white" />;
+                return <ArrowDownToLine className="h-4 w-4 text-neutral-400" />;
             case "STAKE":
-                return <DollarSign className="h-4 w-4 text-white" />;
+                return <DollarSign className="h-4 w-4 text-neutral-400" />;
             case "REFUND":
-                return <ArrowUpFromLine className="h-4 w-4 text-white" />;
+                return <ArrowUpFromLine className="h-4 w-4 text-neutral-400" />;
             default:
-                return <DollarSign className="h-4 w-4 text-white/50" />;
+                return <DollarSign className="h-4 w-4 text-neutral-500" />;
         }
     };
 
@@ -346,23 +347,23 @@ export default function ProfilePage() {
                 {/* Wallet Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                     {/* Balance Card */}
-                    <Card className="lg:col-span-2 bg-linear-to-br from-white/15 to-white/10 border-white/10 backdrop-blur-sm">
+                    <Card className="lg:col-span-2">
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-white">
+                            <CardTitle className="flex items-center gap-2 text-white font-light">
                                 <Wallet className="h-5 w-5" />
                                 xStream Wallet Balance
                             </CardTitle>
-                            <CardDescription className="text-blue-100">
+                            <CardDescription className="text-neutral-400 font-light">
                                 Available for video viewing
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
                                 <div>
-                                    <div className="text-5xl font-bold text-white mb-2">
+                                    <div className="text-5xl font-light text-white mb-2">
                                         ${userData?.walletBalance ? parseFloat(userData.walletBalance.toString()).toFixed(4) : walletBalance.toFixed(4)}
                                     </div>
-                                    <div className="text-sm text-blue-100">USDC on Base Sepolia</div>
+                                    <div className="text-sm text-neutral-400 font-light">USDC on Base Sepolia</div>
                                 </div>
                                 <div className="flex gap-3">
                                     <WalletDepositModal onSuccess={refreshAllData} />
@@ -370,7 +371,7 @@ export default function ProfilePage() {
                                         variant="outline"
                                         onClick={refreshAllData}
                                         disabled={loading || walletLoading}
-                                        className="gap-2 text-white border-white/20 hover:bg-white/10"
+                                        className="gap-2"
                                     >
                                         <RefreshCw className={`h-4 w-4 ${(loading || walletLoading) ? "animate-spin" : ""}`} />
                                         Refresh
@@ -378,7 +379,7 @@ export default function ProfilePage() {
                                     <Button
                                         variant="outline"
                                         onClick={() => window.open('https://faucet.circle.com/', '_blank')}
-                                        className="gap-2 text-white border-white/20 hover:bg-white/10"
+                                        className="gap-2"
                                     >
                                         <Droplet className="h-4 w-4" />
                                         Get USDC
@@ -390,12 +391,12 @@ export default function ProfilePage() {
 
                     {/* Quick Stats */}
                     <div className="space-y-4">
-                        <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+                        <Card>
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-sm text-white/70 mb-1">Total Deposits</p>
-                                        <p className="text-2xl font-bold text-white">
+                                        <p className="text-sm text-neutral-400 font-light mb-1">Total Deposits</p>
+                                        <p className="text-2xl font-light text-white">
                                             $
                                             {transactions
                                                 .filter((tx) => tx.type === "DEPOSIT")
@@ -403,17 +404,17 @@ export default function ProfilePage() {
                                                 .toFixed(4)}
                                         </p>
                                     </div>
-                                    <TrendingUp className="h-8 w-8 text-white" />
+                                    <TrendingUp className="h-8 w-8 text-neutral-400" />
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+                        <Card>
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-sm text-white/70 mb-1">Total Spent</p>
-                                        <p className="text-2xl font-bold text-white">
+                                        <p className="text-sm text-neutral-400 font-light mb-1">Total Spent</p>
+                                        <p className="text-2xl font-light text-white">
                                             $
                                             {transactions
                                                 .filter((tx) => tx.type === "STAKE")
@@ -421,24 +422,24 @@ export default function ProfilePage() {
                                                 .toFixed(4)}
                                         </p>
                                     </div>
-                                    <TrendingDown className="h-8 w-8 text-white" />
+                                    <TrendingDown className="h-8 w-8 text-neutral-400" />
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20 backdrop-blur-sm">
+                        <Card>
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-sm text-green-200/70 mb-1">Creator Earnings</p>
-                                        <p className="text-2xl font-bold text-green-100">
+                                        <p className="text-sm text-neutral-400 font-light mb-1">Creator Earnings</p>
+                                        <p className="text-2xl font-light text-white">
                                             ${userData?.stats.creatorEarnings.toFixed(4) || "0.0000"}
                                         </p>
-                                        <p className="text-xs text-green-200/50 mt-1">
+                                        <p className="text-xs text-neutral-500 font-light mt-1">
                                             From {userData?.stats.totalVideos || 0} videos • {userData?.stats.totalViews || 0} views
                                         </p>
                                     </div>
-                                    <DollarSign className="h-8 w-8 text-green-300" />
+                                    <DollarSign className="h-8 w-8 text-neutral-400" />
                                 </div>
                             </CardContent>
                         </Card>
@@ -451,23 +452,23 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Transaction History */}
-                <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+                <Card>
                     <CardHeader>
-                        <CardTitle className="text-white">Transaction History</CardTitle>
-                        <CardDescription className="text-white/70">
+                        <CardTitle className="text-white font-light">Transaction History</CardTitle>
+                        <CardDescription className="text-neutral-400 font-light">
                             Your recent wallet activity
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         {walletLoading ? (
                             <div className="flex items-center justify-center py-12">
-                                <Loader2 className="h-8 w-8 animate-spin text-white/50" />
+                                <Loader2 className="h-8 w-8 animate-spin text-neutral-400" />
                             </div>
                         ) : transactions.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-12">
-                                <AlertCircle className="h-12 w-12 text-white/30 mb-3" />
-                                <p className="text-white/50 mb-2">No transactions yet</p>
-                                <p className="text-white/30 text-sm mt-1 mb-4">
+                                <AlertCircle className="h-12 w-12 text-neutral-600 mb-3" />
+                                <p className="text-neutral-400 font-light mb-2">No transactions yet</p>
+                                <p className="text-neutral-500 font-light text-sm mt-1 mb-4">
                                     Deposit funds to get started
                                 </p>
                                 <WalletDepositModal onSuccess={fetchWalletData} />
@@ -486,10 +487,10 @@ export default function ProfilePage() {
                                             <div>
                                                 <div className="flex items-center gap-2">
                                                 </div>
-                                                <p className="text-sm text-white/70">
+                                                <p className="text-sm text-neutral-400 font-light">
                                                     {tx.description || "No description"}
                                                 </p>
-                                                <p className="text-xs text-white/50 mt-1">
+                                                <p className="text-xs text-neutral-500 font-light mt-1">
                                                     {formatDistanceToNow(new Date(tx.createdAt), {
                                                         addSuffix: true,
                                                     })}
@@ -498,16 +499,16 @@ export default function ProfilePage() {
                                         </div>
                                         <div className="text-right">
                                             <p
-                                                className={`text-lg font-semibold ${
+                                                className={`text-lg font-light ${
                                                     tx.type === "DEPOSIT" || tx.type === "REFUND"
-                                                        ? "text-green-400"
+                                                        ? "text-white"
                                                         : "text-white"
                                                 }`}
                                             >
                                                 {tx.type === "DEPOSIT" || tx.type === "REFUND" ? "+" : "-"}$
                                                 {parseFloat(tx.amount).toFixed(4)}
                                             </p>
-                                            <p className="text-xs text-white/50">USDC</p>
+                                            <p className="text-xs text-neutral-500 font-light">USDC</p>
                                         </div>
                                     </div>
                                 ))}
@@ -517,15 +518,15 @@ export default function ProfilePage() {
                 </Card>
 
                 {/* Info Card */}
-                <Card className="mt-6 bg-white/5 border-white/10 backdrop-blur-sm">
+                <Card className="mt-6">
                     <CardContent className="p-6">
                         <div className="flex gap-4">
                             <div className="p-3 rounded-lg bg-white/5">
-                                <Wallet className="h-6 w-6 text-white" />
+                                <Wallet className="h-6 w-6 text-neutral-400" />
                             </div>
                             <div>
-                                <h3 className="text-white font-semibold mb-2">How the Wallet Works</h3>
-                                <ul className="text-sm text-white/70 space-y-1">
+                                <h3 className="text-white font-light mb-2">How the Wallet Works</h3>
+                                <ul className="text-sm text-neutral-400 font-light space-y-1">
                                     <li>• Deposit USDC once using x402 payment protocol</li>
                                     <li>• Automatically stake before watching each video</li>
                                     <li>• Pay only for the time you actually watch</li>

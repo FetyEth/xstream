@@ -164,7 +164,7 @@ export default function VideoPlayer({ video, connectedWallet, onBalanceUpdate }:
           setIsLoadingBalance(true);
 
           // Normalize address to lowercase for consistency
-          const normalizedAddress = userWalletAddress.toLowerCase();
+          const normalizedAddress = userWalletAddress;
           const response = await fetch(`/api/users/${normalizedAddress}`);
 
           

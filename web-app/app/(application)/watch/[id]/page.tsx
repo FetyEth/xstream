@@ -7,20 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Loading } from "@/components/ui/loading";
-import { Name } from "@coinbase/onchainkit/identity";
 import { useAccount } from "wagmi";
 import { useUser } from "@/app/hooks/useUser";
 import {
   ThumbsUp,
-  ThumbsDown,
-  Share,
-  Download,
   Flag,
   Eye,
   Calendar,
   DollarSign,
-  Zap,
-  Award,
   Users,
 } from "lucide-react";
 import VideoPlayer from "@/components/VideoPlayer";
@@ -179,9 +173,7 @@ export default function WatchPage() {
               address: address || "",
               isConnected: isConnected,
             }}
-            onBalanceUpdate={(newBalance) =>
-              console.log("Balance updated:", newBalance)
-            }
+            onBalanceUpdate={() => {}}
           />
 
           {/* Video Info */}
@@ -230,89 +222,38 @@ export default function WatchPage() {
                     </Avatar>
                     <div>
                       <h3 className="font-light text-white">
-                        <Name
-                          address={
-                            video.creator?.walletAddress as `0x${string}`
-                          }
-                        />
+                        {video.creator?.displayName || video.creator?.username || 
+                          `${video.creator?.walletAddress?.slice(0, 6)}...${video.creator?.walletAddress?.slice(-4)}`}
                       </h3>
                       <p className="text-sm text-white/50 font-light">
-                        {video.creator?.walletAddress?.slice(0, 6)}...
-                        {video.creator?.walletAddress?.slice(-4)}
+                        {video.creator?.username && video.creator?.displayName && `@${video.creator.username} • `}
+                        {subscriberCount.toLocaleString()} subscriber{subscriberCount !== 1 ? 's' : ''}
                       </p>
                     </div>
-                    <Button variant="default" className="ml-4">
-                      Subscribe
+                    <Button 
+                      variant={isSubscribed ? "secondary" : "default"} 
+                      className="ml-4"
+                      onClick={handleSubscribe}
+                      disabled={actionLoading || !user}
+                    >
+                      {isSubscribed ? "Subscribed" : "Subscribe"}
                     </Button>
                   </div>
 
                   <div className="flex items-center space-x-2">
-                    <div className="flex items-center bg-white/[0.02] border border-white/10 rounded-full">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="rounded-l-full"
-                      >
-                        <ThumbsUp className="h-4 w-4 mr-1" />0
-                      </Button>
-                      <div className="w-px h-6 bg-white/10" />
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="rounded-r-full"
-                      >
-                        <ThumbsDown className="h-4 w-4 mr-1" />0
-                      </Button>
-                    </div>
-                    <Button variant="outline" size="sm">
-                      <Share className="h-4 w-4 mr-1" />
-                      Share
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-1" />
-                      Download
+                    <Button
+                      variant={isLiked ? "secondary" : "outline"}
+                      size="sm"
+                      onClick={handleLike}
+                      disabled={actionLoading || !user}
+                      className="rounded-full"
+                    >
+                      <ThumbsUp className={`h-4 w-4 mr-1 ${isLiked ? 'fill-current' : ''}`} />
+                      {likeCount.toLocaleString()}
                     </Button>
                     <Button variant="ghost" size="sm">
                       <Flag className="h-4 w-4" />
                     </Button>
-                  </div>
-                </div>
-
-                {/* xStream Features */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-white/[0.02] rounded-md border border-white/10">
-                  <div className="flex items-center space-x-2">
-                    <Zap className="h-5 w-5 text-white/70" />
-                    <div>
-                      <p className="text-sm font-light text-white">
-                        Pay per Second
-                      </p>
-                      <p className="text-xs text-white/50 font-light">
-                        Only pay for what you watch
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <DollarSign className="h-5 w-5 text-white/70" />
-                    <div>
-                      <p className="text-sm font-light text-white">
-                        Direct to Creator
-                      </p>
-                      <p className="text-xs text-white/50 font-light">
-                        ${parseFloat(video.totalEarnings || "0").toFixed(2)}{" "}
-                        earned
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Award className="h-5 w-5 text-white/70" />
-                    <div>
-                      <p className="text-sm font-light text-white">
-                        Earn NFT Rewards
-                      </p>
-                      <p className="text-xs text-white/50 font-light">
-                        Watch to unlock rewards
-                      </p>
-                    </div>
                   </div>
                 </div>
 
@@ -344,9 +285,6 @@ export default function WatchPage() {
               <div className="text-center py-8 text-white/50 font-light">
                 <Users className="h-12 w-12 mx-auto mb-2 opacity-50" />
                 <p>Comments coming soon...</p>
-                <p className="text-sm">
-                  Connect your wallet to leave a comment
-                </p>
               </div>
             </CardContent>
           </Card>

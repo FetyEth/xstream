@@ -11,7 +11,7 @@ export const userService = {
     profileImage?: string
   }) {
     // Normalize to lowercase
-    const normalizedAddress = walletAddress.toLowerCase();
+    const normalizedAddress = walletAddress;
     
     return await prisma.user.upsert({
       where: { walletAddress: normalizedAddress },
@@ -26,7 +26,7 @@ export const userService = {
   // Find user by wallet
   async findByWallet(walletAddress: string) {
     // Normalize to lowercase for case-insensitive comparison
-    const normalizedAddress = walletAddress.toLowerCase();
+    const normalizedAddress = walletAddress;
     
     return await prisma.user.findUnique({
       where: { 
@@ -38,7 +38,7 @@ export const userService = {
   // Get user with stats
   async getUserWithStats(walletAddress: string) {
     // Normalize to lowercase
-    const normalizedAddress = walletAddress.toLowerCase();
+    const normalizedAddress = walletAddress;
     
     const user = await prisma.user.findUnique({
       where: { walletAddress: normalizedAddress },

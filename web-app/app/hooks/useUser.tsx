@@ -33,7 +33,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
     try {
       // Normalize address to lowercase for consistency
-      const normalizedAddress = address.toLowerCase();
+      const normalizedAddress = address;
       const response = await fetch(`/api/users?walletAddress=${normalizedAddress}`);
       
       if (response.ok) {

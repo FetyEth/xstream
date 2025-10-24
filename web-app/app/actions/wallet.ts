@@ -22,7 +22,7 @@ export async function depositToWallet(
 ): Promise<{ success: boolean; error?: string; balance?: string }> {
   try {
     // Normalize wallet address to lowercase for consistency
-    const normalizedAddress = walletAddress.toLowerCase();
+    const normalizedAddress = walletAddress;
     
     // Payment requirements for deposit
     const paymentRequirements: PaymentRequirements = {
@@ -119,7 +119,7 @@ export async function getWalletBalance(
 ): Promise<{ success: boolean; balance?: string; transactions?: any[]; error?: string }> {
   try {
     // Normalize wallet address to lowercase for consistency
-    const normalizedAddress = walletAddress.toLowerCase();
+    const normalizedAddress = walletAddress;
     
     const user = await prisma.user.findUnique({
       where: { walletAddress: normalizedAddress },

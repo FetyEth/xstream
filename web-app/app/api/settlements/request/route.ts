@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     
     if (!finalCreatorId && walletAddress) {
       // Normalize wallet address to lowercase
-      const normalizedAddress = walletAddress.toLowerCase();
+      const normalizedAddress = walletAddress;
       
       // Find user by wallet address
       const user = await prisma.user.findUnique({
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
     
     if (!finalCreatorId && walletAddress) {
       // Normalize wallet address to lowercase
-      const normalizedAddress = walletAddress.toLowerCase();
+      const normalizedAddress = walletAddress;
       
       const user = await prisma.user.findUnique({
         where: { walletAddress: normalizedAddress }

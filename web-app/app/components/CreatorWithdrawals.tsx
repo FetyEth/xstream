@@ -102,41 +102,41 @@ export default function CreatorWithdrawals() {
   return (
     <div className="space-y-6">
       {/* Earnings Card */}
-      <Card className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20 backdrop-blur-sm">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-white">
+          <CardTitle className="flex items-center gap-2 text-white font-light">
             <DollarSign className="h-5 w-5" />
             Creator Earnings
           </CardTitle>
-          <CardDescription className="text-purple-100">
+          <CardDescription className="text-neutral-400 font-light">
             Earnings from your uploaded videos
           </CardDescription>
         </CardHeader>
         <CardContent>
           {loading && !earnings ? (
             <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-white/50" />
+              <Loader2 className="h-8 w-8 animate-spin text-neutral-400" />
             </div>
           ) : (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                  <p className="text-sm text-white/70 mb-1">Total Earnings</p>
-                  <p className="text-2xl font-bold text-white">
+                  <p className="text-sm text-neutral-400 font-light mb-1">Total Earnings</p>
+                  <p className="text-2xl font-light text-white">
                     ${earnings?.total.toFixed(4) || '0.0000'}
                   </p>
                 </div>
                 
-                <div className="bg-white/10 rounded-lg p-4 border border-white/20">
-                  <p className="text-sm text-green-200/70 mb-1">Available</p>
-                  <p className="text-2xl font-bold text-green-100">
+                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <p className="text-sm text-neutral-400 font-light mb-1">Available</p>
+                  <p className="text-2xl font-light text-white">
                     ${earnings?.available.toFixed(4) || '0.0000'}
                   </p>
                 </div>
                 
                 <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                  <p className="text-sm text-white/70 mb-1">Withdrawn</p>
-                  <p className="text-2xl font-bold text-white">
+                  <p className="text-sm text-neutral-400 font-light mb-1">Withdrawn</p>
+                  <p className="text-2xl font-light text-white">
                     ${earnings?.settled.toFixed(4) || '0.0000'}
                   </p>
                 </div>
@@ -145,8 +145,8 @@ export default function CreatorWithdrawals() {
               {/* Withdraw Button */}
               <div className="mt-4">
                 {error && (
-                  <div className="mb-4 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-                    <p className="text-red-200 text-sm flex items-center gap-2">
+                  <div className="mb-4 bg-white/5 border border-white/10 rounded-lg p-3">
+                    <p className="text-neutral-400 text-sm font-light flex items-center gap-2">
                       <AlertCircle className="h-4 w-4" />
                       {error}
                     </p>
@@ -154,8 +154,8 @@ export default function CreatorWithdrawals() {
                 )}
                 
                 {success && (
-                  <div className="mb-4 bg-green-500/10 border border-green-500/20 rounded-lg p-3">
-                    <p className="text-green-200 text-sm flex items-center gap-2">
+                  <div className="mb-4 bg-white/5 border border-white/10 rounded-lg p-3">
+                    <p className="text-white text-sm font-light flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" />
                       {success}
                     </p>
@@ -165,11 +165,7 @@ export default function CreatorWithdrawals() {
                 <Button
                   onClick={requestWithdrawal}
                   disabled={requesting || !earnings?.canWithdraw}
-                  className={`w-full gap-2 ${
-                    earnings?.canWithdraw && !requesting
-                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
-                      : 'bg-white/10'
-                  }`}
+                  className="w-full gap-2"
                 >
                   {requesting ? (
                     <>
@@ -191,7 +187,7 @@ export default function CreatorWithdrawals() {
                   )}
                 </Button>
                 
-                <div className="text-xs text-white/50 mt-3 space-y-1">
+                <div className="text-xs text-neutral-500 font-light mt-3 space-y-1">
                   <p className="flex items-center gap-1">
                     ⚠️ Temporarily allowing withdrawals of any amount • Future minimum: $10 USDC
                   </p>
@@ -210,10 +206,10 @@ export default function CreatorWithdrawals() {
 
       {/* Settlement History */}
       {settlements.length > 0 && (
-        <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-white">Withdrawal History</CardTitle>
-            <CardDescription className="text-white/70">
+            <CardTitle className="text-white font-light">Withdrawal History</CardTitle>
+            <CardDescription className="text-neutral-400 font-light">
               Track your settlement requests and payouts
             </CardDescription>
           </CardHeader>
@@ -227,18 +223,18 @@ export default function CreatorWithdrawals() {
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <p className="text-lg font-semibold text-white">
+                        <p className="text-lg font-light text-white">
                           ${Number(settlement.amount).toFixed(2)} USDC
                         </p>
                         <span
-                          className={`px-2 py-1 text-xs font-medium rounded flex items-center gap-1 ${
+                          className={`px-2 py-1 text-xs font-light rounded flex items-center gap-1 ${
                             settlement.status === 'COMPLETED'
-                              ? 'bg-green-500/20 text-green-200'
+                              ? 'bg-white/10 text-white border border-white/20'
                               : settlement.status === 'PROCESSING'
-                              ? 'bg-blue-500/20 text-blue-200'
+                              ? 'bg-white/10 text-white border border-white/20'
                               : settlement.status === 'PENDING'
-                              ? 'bg-yellow-500/20 text-yellow-200'
-                              : 'bg-red-500/20 text-red-200'
+                              ? 'bg-white/10 text-white border border-white/20'
+                              : 'bg-white/5 text-neutral-400 border border-white/10'
                           }`}
                         >
                           {settlement.status === 'COMPLETED' && <CheckCircle className="h-3 w-3" />}
@@ -248,12 +244,12 @@ export default function CreatorWithdrawals() {
                         </span>
                       </div>
                       
-                      <p className="text-sm text-white/50">
+                      <p className="text-sm text-neutral-500 font-light">
                         Requested: {new Date(settlement.requestedAt).toLocaleString()}
                       </p>
                       
                       {settlement.completedAt && (
-                        <p className="text-sm text-white/50">
+                        <p className="text-sm text-neutral-500 font-light">
                           Completed: {new Date(settlement.completedAt).toLocaleString()}
                         </p>
                       )}
@@ -263,7 +259,7 @@ export default function CreatorWithdrawals() {
                           href={`https://sepolia.basescan.org/tx/${settlement.txHash}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm text-purple-300 hover:text-purple-200 mt-1 inline-block"
+                          className="text-sm text-neutral-400 hover:text-white font-light mt-1 inline-block transition-colors"
                         >
                           View Transaction on BaseScan →
                         </a>

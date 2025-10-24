@@ -2,7 +2,6 @@
 // Handles automated USDC payouts to creators from platform wallet
 
 import { CdpClient } from "@coinbase/cdp-sdk";
-import * as fs from 'fs';
 
 const USDC_ADDRESS_BASE_SEPOLIA = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
 
@@ -29,13 +28,10 @@ class SettlementAgent {
     if (this.initialized) return true;
 
     try {
-      // Read CDP API key file
-      const keyFilePath = process.env.CDP_API_KEY_FILE_PATH || "./cdp_api_key.json";
-      const keyData = JSON.parse(fs.readFileSync(keyFilePath, 'utf8'));
-      
-      // Set environment variables for CDP Client
-      process.env.CDP_API_KEY_ID = keyData.id;
-      process.env.CDP_API_KEY_SECRET = keyData.privateKey;
+      // Check if all required environment variables are set
+      if (!process.env.CDP_API_KEY_ID || !process.env.CDP_API_KEY_SECRET) {
+        throw new Error("CDP_API_KEY_ID and CDP_API_KEY_SECRET environment variables are required. Please add them to your .env file.");
+      }
       
       // CDP_WALLET_SECRET is required for wallet operations - check if it's set
       if (!process.env.CDP_WALLET_SECRET) {
