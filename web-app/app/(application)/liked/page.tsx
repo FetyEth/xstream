@@ -91,7 +91,7 @@ export default function LikedVideosPage() {
             <h1 className="text-3xl font-light text-white">Liked Videos</h1>
           </div>
           <p className="text-white/50 font-light">
-            {pagination.total} video{pagination.total !== 1 ? 's' : ''} you've liked
+            {pagination.total} video{pagination.total !== 1 ? 's' : ''} you&apos;ve liked
           </p>
         </div>
 

@@ -4,13 +4,11 @@ import {
   Home, 
   TrendingUp,
   ThumbsUp, 
-  Heart, 
   History, 
   PlaySquare,
   Upload,
   ChevronLeft,
   ChevronRight,
-  DollarSignIcon,
   Users
 } from "lucide-react";
 import Link from "next/link";

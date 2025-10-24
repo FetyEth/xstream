@@ -32,7 +32,7 @@ import WalletBalance from "@/components/WalletBalance";
 
 export default function Header() {
   const { chain } = useAccount();
-  const { chains, switchChain } = useSwitchChain();
+  const { switchChain } = useSwitchChain();
 
   const getNetworkName = (chainId: number | undefined) => {
     if (!chainId) return "Not Connected";

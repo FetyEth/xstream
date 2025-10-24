@@ -1,6 +1,6 @@
 'use client';
 
-import { base, baseSepolia, mainnet, sepolia, optimism, arbitrum, polygon } from 'wagmi/chains';
+import { base, baseSepolia } from 'wagmi/chains';
 import { OnchainKitProvider } from '@coinbase/onchainkit';
 import { WagmiProvider, createConfig, http } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';

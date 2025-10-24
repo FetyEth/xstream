@@ -19,7 +19,7 @@ import { Search, User, Network } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAccount, useSwitchChain } from "wagmi";
-import { base, baseSepolia } from "wagmi/chains";
+import { baseSepolia } from "wagmi/chains";
 import {
   DropdownMenu,
   DropdownMenuContent,

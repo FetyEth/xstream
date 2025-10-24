@@ -8,8 +8,6 @@ import path from 'path';
 import { randomUUID } from 'crypto';
 import ffmpegPath from 'ffmpeg-static';
 const ffprobeStatic = require('ffprobe-static');
-// @ts-ignore
-// import ffprobeStatic from 'ffprobe-static';
 
 const execAsync = promisify(exec);
 

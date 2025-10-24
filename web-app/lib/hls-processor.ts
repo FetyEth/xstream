@@ -284,5 +284,6 @@ async function cleanupDirectory(dir: string): Promise<void> {
     await rmdir(dir);
   } catch (error) {
     // Ignore errors during cleanup
+    console.error('Cleanup error:', error);
   }
 }

@@ -79,7 +79,7 @@ export default function StakeConfirmationModal({
             Confirm Stake
           </DialogTitle>
           <DialogDescription className="text-white/70">
-            Watch "{videoTitle}"
+            Watch &quot;{videoTitle}&quot;
           </DialogDescription>
         </DialogHeader>
 
@@ -138,7 +138,7 @@ export default function StakeConfirmationModal({
           {/* Refund information */}
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
             <p className="text-xs text-blue-300">
-              <strong>Auto-Refund:</strong> You'll only be charged for the time you actually watch.
+              <strong>Auto-Refund:</strong> You&apos;ll only be charged for the time you actually watch.
               If you watch 50% of the video, 50% of your stake will be refunded automatically.
             </p>
           </div>

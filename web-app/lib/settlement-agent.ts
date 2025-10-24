@@ -3,7 +3,6 @@
 
 import { CdpClient } from "@coinbase/cdp-sdk";
 
-const USDC_ADDRESS_BASE_SEPOLIA = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
 
 export interface SettlementConfig {
   networkId: string; // "base-sepolia" or "base-mainnet"
