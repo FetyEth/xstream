@@ -1,6 +1,7 @@
 // API Route: Request Creator Settlement
 import { NextRequest, NextResponse } from 'next/server';
 import { settlementService } from '@/lib/settlement-service';
+import { getSettlementAgent } from '@/lib/settlement-agent';
 import { prisma } from '@/lib/prisma';
 
 // POST /api/settlements/request - Request a settlement
@@ -11,14 +12,12 @@ export async function POST(request: NextRequest) {
 
     // Support both creatorId and walletAddress
     let finalCreatorId = creatorId;
+    let finalWalletAddress = walletAddress;
     
     if (!finalCreatorId && walletAddress) {
-      // Normalize wallet address to lowercase
-      const normalizedAddress = walletAddress;
-      
       // Find user by wallet address
       const user = await prisma.user.findUnique({
-        where: { walletAddress: normalizedAddress }
+        where: { walletAddress }
       });
       
       if (!user) {
@@ -29,6 +28,7 @@ export async function POST(request: NextRequest) {
       }
       
       finalCreatorId = user.id;
+      finalWalletAddress = user.walletAddress;
     }
 
     if (!finalCreatorId) {
@@ -55,12 +55,65 @@ export async function POST(request: NextRequest) {
     // Create settlement request
     const settlement = await settlementService.requestSettlement(finalCreatorId);
 
-    return NextResponse.json({ 
-      success: true,
-      settlement,
-      amount: Number(settlement.amount).toFixed(2),
-      message: `Settlement request for $${Number(settlement.amount).toFixed(2)} created successfully`
-    });
+    // Immediately process the settlement (instead of waiting for cron)
+    try {
+      // Initialize settlement agent
+      const agent = await getSettlementAgent({
+        networkId: "base-sepolia",
+        minThreshold: 0 // No minimum for instant processing
+      });
+
+      // Mark as processing
+      await settlementService.markProcessing(settlement.id);
+
+      // Send USDC
+      const result = await agent.sendSettlement(
+        finalWalletAddress,
+        Number(settlement.amount)
+      );
+
+      if (result.success && result.txHash) {
+        // Mark as completed
+        await settlementService.markCompleted(settlement.id, result.txHash);
+        
+        return NextResponse.json({ 
+          success: true,
+          settlement: {
+            ...settlement,
+            status: 'COMPLETED',
+            txHash: result.txHash
+          },
+          amount: Number(settlement.amount).toFixed(4),
+          txHash: result.txHash,
+          message: `Withdrawal completed! $${Number(settlement.amount).toFixed(4)} sent to your wallet.`
+        });
+      } else {
+        // Mark as failed
+        await settlementService.markFailed(
+          settlement.id,
+          result.error || 'Transaction failed'
+        );
+        
+        return NextResponse.json(
+          { 
+            error: `Withdrawal failed: ${result.error || 'Transaction failed'}`,
+            settlement
+          },
+          { status: 500 }
+        );
+      }
+    } catch (processingError: any) {
+      // Mark as failed
+      await settlementService.markFailed(settlement.id, processingError.message);
+      
+      return NextResponse.json(
+        { 
+          error: `Withdrawal failed: ${processingError.message}`,
+          settlement
+        },
+        { status: 500 }
+      );
+    }
   } catch (error: any) {
     console.error('Error requesting settlement:', error);
     return NextResponse.json(
@@ -81,11 +134,8 @@ export async function GET(request: NextRequest) {
     let finalCreatorId = creatorId;
     
     if (!finalCreatorId && walletAddress) {
-      // Normalize wallet address to lowercase
-      const normalizedAddress = walletAddress;
-      
       const user = await prisma.user.findUnique({
-        where: { walletAddress: normalizedAddress }
+        where: { walletAddress }
       });
       
       if (!user) {

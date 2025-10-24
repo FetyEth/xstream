@@ -80,7 +80,14 @@ export default function CreatorWithdrawals() {
         throw new Error(data.error || 'Failed to request withdrawal');
       }
 
-      setSuccess(`Withdrawal requested! Amount: $${data.amount}`);
+      // Show success with transaction link
+      if (data.txHash) {
+        setSuccess(
+          `✅ Withdrawal completed! $${data.amount} sent to your wallet. View on BaseScan: ${data.txHash.slice(0, 10)}...`
+        );
+      } else {
+        setSuccess(`Withdrawal completed! Amount: $${data.amount}`);
+      }
       
       // Refresh data
       await fetchData();

@@ -37,11 +37,8 @@ export const userService = {
 
   // Get user with stats
   async getUserWithStats(walletAddress: string) {
-    // Normalize to lowercase
-    const normalizedAddress = walletAddress;
-    
     const user = await prisma.user.findUnique({
-      where: { walletAddress: normalizedAddress },
+      where: { walletAddress },
       include: {
         videos: {
           select: {
