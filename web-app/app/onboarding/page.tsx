@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -11,11 +11,19 @@ import { Badge } from '@/components/ui/badge';
 import { UserProvider, useUser } from '../hooks/useUser';
 import { User, Wallet } from 'lucide-react';
 import Image from 'next/image';
+import { Loading } from '@/components/ui/loading';
 
 function OnboardingForm() {
   const { address } = useAccount();
-  const { refreshUser } = useUser();
+  const { user, isLoading, refreshUser } = useUser();
   const router = useRouter();
+  
+  // Redirect if user already exists
+  useEffect(() => {
+    if (!isLoading && user) {
+      router.push('/dashboard');
+    }
+  }, [user, isLoading, router]);
   const [formData, setFormData] = useState({
     username: '',
     displayName: '',
@@ -86,6 +94,20 @@ function OnboardingForm() {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
   };
+
+  // Show loading while checking if user exists
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loading text="Loading..." size="lg" />
+      </div>
+    );
+  }
+
+  // Don't render form if user already exists (will redirect)
+  if (user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">

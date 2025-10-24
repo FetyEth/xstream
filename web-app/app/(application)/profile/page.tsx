@@ -29,6 +29,7 @@ import { formatDistanceToNow } from "date-fns";
 
 interface UserStats {
     totalEarned: number;
+    creatorEarnings: number;
     totalVideos: number;
     totalViews: number;
     totalWatchTime: number;
@@ -366,6 +367,23 @@ export default function ProfilePage() {
                                         </p>
                                     </div>
                                     <TrendingDown className="h-8 w-8 text-white" />
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20 backdrop-blur-sm">
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-green-200/70 mb-1">Creator Earnings</p>
+                                        <p className="text-2xl font-bold text-green-100">
+                                            ${userData?.stats.creatorEarnings.toFixed(2) || "0.00"}
+                                        </p>
+                                        <p className="text-xs text-green-200/50 mt-1">
+                                            From {userData?.stats.totalVideos || 0} videos • {userData?.stats.totalViews || 0} views
+                                        </p>
+                                    </div>
+                                    <DollarSign className="h-8 w-8 text-green-300" />
                                 </div>
                             </CardContent>
                         </Card>

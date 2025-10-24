@@ -10,10 +10,13 @@ export const userService = {
     displayName?: string
     profileImage?: string
   }) {
+    // Normalize to lowercase
+    const normalizedAddress = walletAddress.toLowerCase();
+    
     return await prisma.user.upsert({
-      where: { walletAddress: walletAddress },
+      where: { walletAddress: normalizedAddress },
       create: {
-        walletAddress: walletAddress,
+        walletAddress: normalizedAddress,
         ...data
       },
       update: data || {}
@@ -22,15 +25,23 @@ export const userService = {
 
   // Find user by wallet
   async findByWallet(walletAddress: string) {
+    // Normalize to lowercase for case-insensitive comparison
+    const normalizedAddress = walletAddress.toLowerCase();
+    
     return await prisma.user.findUnique({
-      where: { walletAddress: walletAddress }
-    })
+      where: { 
+        walletAddress: normalizedAddress
+      }
+    });
   },
 
   // Get user with stats
   async getUserWithStats(walletAddress: string) {
+    // Normalize to lowercase
+    const normalizedAddress = walletAddress.toLowerCase();
+    
     const user = await prisma.user.findUnique({
-      where: { walletAddress: walletAddress },
+      where: { walletAddress: normalizedAddress },
       include: {
         videos: {
           select: {
@@ -59,6 +70,7 @@ export const userService = {
 
     // Calculate stats
     const totalEarned = user.earnings.reduce((sum: number, e: any) => sum + Number(e.amount), 0)
+    const creatorEarnings = user.videos.reduce((sum: number, v: any) => sum + Number(v.totalEarnings), 0)
     const totalVideos = user.videos.length
     const totalViews = user.videos.reduce((sum: number, v: any) => sum + v.totalViews, 0)
     const totalWatchTime = user.viewSessions.reduce((sum: number, s: any) => sum + s.watchedSeconds, 0)
@@ -68,6 +80,7 @@ export const userService = {
       ...user,
       stats: {
         totalEarned,
+        creatorEarnings,
         totalVideos,
         totalViews,
         totalWatchTime,
@@ -93,7 +106,6 @@ export const videoService = {
   }) {
     // Normalize wallet address to lowercase for consistency
     const normalizedWallet = data.creatorWallet;
-    console.log("Creating video with creatorWallet:", normalizedWallet);
     
     // First, ensure the user exists
     await prisma.user.upsert({

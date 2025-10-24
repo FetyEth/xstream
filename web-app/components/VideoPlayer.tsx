@@ -123,7 +123,7 @@ export default function VideoPlayer({ video, connectedWallet, onBalanceUpdate }:
         }
         
         const result = await response.json();
-        console.log('✅ Wallet balances updated:', result);
+
         
         // Update local state with actual database values
         setUserBalance(result.fromBalance);
@@ -156,35 +156,26 @@ export default function VideoPlayer({ video, connectedWallet, onBalanceUpdate }:
     }
   };
 
-  // Debug logging for wallet connection
-  useEffect(() => {
-    console.log('🎯 VideoPlayer initialized with:');
-    console.log('   Connected wallet:', connectedWallet);
-    console.log('   User wallet address:', userWalletAddress);
-    console.log('   Wallet connected:', isWalletConnected);
-    console.log('   Creator wallet address:', video.creatorWallet);
-  }, [connectedWallet, userWalletAddress, isWalletConnected, video.creatorWallet]);
-
   // Fetch user data when wallet is connected
   useEffect(() => {
     const fetchUserData = async () => {
       if (userWalletAddress && isWalletConnected) {
         try {
           setIsLoadingBalance(true);
-          console.log('🔍 Fetching USER data for connected wallet:', userWalletAddress);
+
           
           const response = await fetch(`/api/users/${userWalletAddress}`);
-          console.log('📡 User API Response status:', response.status);
+
           
           if (response.ok) {
             const userData = await response.json();
-            console.log('✅ VIEWER data received:', userData);
+
             setUserProfile(userData);
             const balance = parseFloat(userData.walletBalance?.toString() || '0');
             setUserBalance(balance);
-            console.log('💰 VIEWER balance set to:', balance);
+
           } else if (response.status === 404) {
-            console.log('⚠️ Viewer not found, creating user...');
+
             const createResponse = await fetch('/api/users/create', {
               method: 'POST',
               headers: {
@@ -198,7 +189,7 @@ export default function VideoPlayer({ video, connectedWallet, onBalanceUpdate }:
             
             if (createResponse.ok) {
               const newUser = await createResponse.json();
-              console.log('✅ Viewer created:', newUser);
+
               setUserProfile(newUser);
               setUserBalance(parseFloat(newUser.walletBalance.toString()));
             } else {
@@ -217,7 +208,7 @@ export default function VideoPlayer({ video, connectedWallet, onBalanceUpdate }:
           setIsLoadingBalance(false);
         }
       } else if (!isWalletConnected) {
-        console.log('⚠️ Wallet not connected');
+
         setIsLoadingBalance(false);
         setUserBalance(0);
         setUserProfile(null);
@@ -332,10 +323,10 @@ export default function VideoPlayer({ video, connectedWallet, onBalanceUpdate }:
     
     if (qualityIndex === 0) {
       hls.currentLevel = -1;
-      console.log('✅ Quality set to Auto');
+
     } else {
       hls.currentLevel = qualityIndex - 1;
-      console.log(`✅ Quality set to ${availableQualities[qualityIndex]}`);
+
     }
     
     setShowSettings(false);
@@ -404,7 +395,7 @@ export default function VideoPlayer({ video, connectedWallet, onBalanceUpdate }:
     setIsAuthorized(true);
     setShowPaymentDialog(false);
     setShowPaymentConfirm(false);
-    console.log('✅ Payment authorized');
+
   };
 
   // Handle payment confirmation before watching
@@ -510,7 +501,7 @@ export default function VideoPlayer({ video, connectedWallet, onBalanceUpdate }:
               onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
               onLoadedMetadata={() => {
                 setCurrentTime(0);
-                console.log('✅ Video loaded successfully');
+
               }}
               onError={(e) => {
                 console.error('❌ Video playback error');

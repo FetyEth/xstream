@@ -33,10 +33,15 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
     try {
       const response = await fetch(`/api/users?walletAddress=${address}`);
+      
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
+      } else if (response.status === 404) {
+        // User not found - this is expected for new users
+        setUser(null);
       } else {
+        console.error('Failed to fetch user:', response.status);
         setUser(null);
       }
     } catch (error) {

@@ -256,8 +256,21 @@ export async function refundUnusedStake(
     
     const currentBalance = parseFloat(session.viewer.walletBalance?.toString() || "0");
     const balanceAfter = currentBalance + refundAmount;
+    
+    // Get video creator's current earnings
+    const video = await prisma.video.findUnique({
+      where: { id: session.videoId },
+      select: { totalEarnings: true },
+    });
+    
+    if (!video) {
+      return { success: false, error: "Video not found" };
+    }
+    
+    const currentEarnings = parseFloat(video.totalEarnings?.toString() || "0");
+    const newEarnings = currentEarnings + actualCharge;
 
-    // Update session, refund, and create transaction
+    // Update session, refund, update video earnings, and create transaction
     await prisma.$transaction([
       prisma.viewSession.update({
         where: { id: sessionId },
@@ -271,6 +284,14 @@ export async function refundUnusedStake(
       prisma.user.update({
         where: { id: session.viewerId },
         data: { walletBalance: balanceAfter },
+      }),
+      prisma.video.update({
+        where: { id: session.videoId },
+        data: {
+          totalEarnings: newEarnings,
+          totalViews: { increment: 1 },
+          totalWatchTime: { increment: watchedSeconds },
+        },
       }),
       prisma.walletTransaction.create({
         data: {

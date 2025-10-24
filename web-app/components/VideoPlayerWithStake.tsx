@@ -8,7 +8,7 @@ import { refundUnusedStake } from "@/app/actions/wallet";
 import StakeConfirmationModal from "./StakeConfirmationModal";
 import WalletDepositModal from "./WalletDepositModal";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Volume2, VolumeX, Maximize, Loader2, AlertCircle } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, Loader2, AlertCircle, Settings } from "lucide-react";
 
 interface VideoPlayerWithStakeProps {
   video: {
@@ -24,8 +24,6 @@ export default function VideoPlayerWithStake({ video }: VideoPlayerWithStakeProp
   const { address, isConnected } = useAccount();
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
-  
-  console.log("🎬 VideoPlayerWithStake component loaded - NEW VERSION with Start Overlay");
   
   // Player state
   const [isPlaying, setIsPlaying] = useState(false);
@@ -90,9 +88,7 @@ export default function VideoPlayerWithStake({ video }: VideoPlayerWithStakeProp
           hls.attachMedia(videoRef.current);
           
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            console.log("HLS manifest loaded");
             setLoadingVideo(false);
-            console.log("Start overlay should show:", showStartOverlay);
           });
 
           hls.on(Hls.Events.ERROR, (event, data) => {
@@ -122,6 +118,21 @@ export default function VideoPlayerWithStake({ video }: VideoPlayerWithStakeProp
       }
     };
   }, [video.id]);
+
+  // Close quality menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showQualityMenu) {
+        const target = event.target as HTMLElement;
+        if (!target.closest('.quality-menu-container')) {
+          setShowQualityMenu(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showQualityMenu]);
 
   // Handle start video confirmation
   const handleStartVideo = async () => {
@@ -210,7 +221,6 @@ export default function VideoPlayerWithStake({ video }: VideoPlayerWithStakeProp
       );
 
       if (result.success) {
-        console.log("Refunded unused stake");
         await fetchBalance(); // Refresh balance
       }
     } catch (error) {
@@ -223,6 +233,9 @@ export default function VideoPlayerWithStake({ video }: VideoPlayerWithStakeProp
     if (videoRef.current) {
       const handleEnded = () => {
         setIsPlaying(false);
+        if (videoRef.current) {
+          videoRef.current.pause();
+        }
         handleRefund();
       };
       
@@ -463,6 +476,38 @@ export default function VideoPlayerWithStake({ video }: VideoPlayerWithStakeProp
                   </span>
                 </div>
               )}
+              
+              {/* Quality Selector */}
+              <div className="relative quality-menu-container">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowQualityMenu(!showQualityMenu)}
+                  className="text-white hover:bg-white/10 p-2"
+                >
+                  <Settings className="h-5 w-5" />
+                </Button>
+                
+                {showQualityMenu && (
+                  <div className="absolute bottom-full right-0 mb-2 bg-black/95 border border-white/10 rounded-lg p-2 min-w-[120px]">
+                    <div className="text-xs text-white/70 mb-2 px-2">Quality</div>
+                    {["1080p", "720p", "480p", "360p", "Auto"].map((q) => (
+                      <button
+                        key={q}
+                        onClick={() => {
+                          setQuality(q);
+                          setShowQualityMenu(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-white/10 ${
+                          quality === q ? "text-blue-400 bg-white/5" : "text-white"
+                        }`}
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               
               <Button
                 variant="ghost"
