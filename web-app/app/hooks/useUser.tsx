@@ -32,7 +32,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const response = await fetch(`/api/users?walletAddress=${address}`);
+      // Normalize address to lowercase for consistency
+      const normalizedAddress = address.toLowerCase();
+      const response = await fetch(`/api/users?walletAddress=${normalizedAddress}`);
       
       if (response.ok) {
         const data = await response.json();

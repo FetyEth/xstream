@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loading } from "@/components/ui/loading";
 import WalletDepositModal from "@/components/WalletDepositModal";
+import CreatorWithdrawals from "@/app/components/CreatorWithdrawals";
 import {
     Calendar,
     Wallet,
@@ -92,14 +93,24 @@ export default function ProfilePage() {
 
             try {
                 setLoading(true);
-                const response = await fetch(`/api/users/${address}/stats`);
+                // Normalize address to lowercase for consistency
+                const normalizedAddress = address.toLowerCase();
+                const response = await fetch(`/api/users/${normalizedAddress}/stats`, {
+                    cache: 'no-store', // Disable caching to get fresh data
+                });
 
                 if (!response.ok) {
+                    console.error('Failed to fetch user stats:', response.status, response.statusText);
                     throw new Error('Failed to fetch user data');
                 }
 
                 const data = await response.json();
                 setUserData(data);
+                
+                // Update wallet balance from userData
+                if (data.walletBalance !== undefined && data.walletBalance !== null) {
+                    setWalletBalance(parseFloat(data.walletBalance.toString()));
+                }
             } catch (err) {
                 console.error('Failed to fetch user data:', err);
                 setError('Unable to load profile data');
@@ -111,15 +122,59 @@ export default function ProfilePage() {
         fetchUserData();
     }, [address]);
 
+    // Update wallet balance when userData changes
+    useEffect(() => {
+        if (userData?.walletBalance) {
+            setWalletBalance(parseFloat(userData.walletBalance.toString()));
+        }
+    }, [userData]);
+
+    // Refresh all data (both user stats and wallet)
+    const refreshAllData = async () => {
+        if (!address) return;
+        
+        setLoading(true);
+        setWalletLoading(true);
+        
+        try {
+            // Normalize address to lowercase for consistency
+            const normalizedAddress = address.toLowerCase();
+            
+            // Fetch user stats
+            const statsResponse = await fetch(`/api/users/${normalizedAddress}/stats`, {
+                cache: 'no-store',
+            });
+            if (statsResponse.ok) {
+                const data = await statsResponse.json();
+                setUserData(data);
+                if (data.walletBalance !== undefined && data.walletBalance !== null) {
+                    const balance = parseFloat(data.walletBalance.toString());
+                    setWalletBalance(balance);
+                }
+            }
+            
+            // Fetch wallet transactions
+            const result = await getWalletBalance(normalizedAddress);
+            if (result.success) {
+                setTransactions(result.transactions || []);
+            }
+        } catch (error) {
+            console.error("Failed to refresh data:", error);
+        } finally {
+            setLoading(false);
+            setWalletLoading(false);
+        }
+    };
+
     // Fetch wallet data
     const fetchWalletData = async () => {
         if (!address) return;
 
         setWalletLoading(true);
         try {
-            const result = await getWalletBalance(address);
+            const normalizedAddress = address.toLowerCase();
+            const result = await getWalletBalance(normalizedAddress);
             if (result.success) {
-                setWalletBalance(parseFloat(result.balance || "0"));
                 setTransactions(result.transactions || []);
             }
         } catch (error) {
@@ -257,7 +312,7 @@ export default function ProfilePage() {
                                             <div className="flex items-center gap-2">
                                                 <span className="text-xs text-white font-medium">USDC</span>
                                                 <span className="text-white font-light">
-                                                    {parseFloat(usdcBalance.formatted).toFixed(2)}
+                                                    {parseFloat(usdcBalance.formatted).toFixed(4)}
                                                 </span>
                                             </div>
                                         </div>
@@ -305,19 +360,19 @@ export default function ProfilePage() {
                             <div className="space-y-4">
                                 <div>
                                     <div className="text-5xl font-bold text-white mb-2">
-                                        ${walletBalance.toFixed(2)}
+                                        ${userData?.walletBalance ? parseFloat(userData.walletBalance.toString()).toFixed(4) : walletBalance.toFixed(4)}
                                     </div>
                                     <div className="text-sm text-blue-100">USDC on Base Sepolia</div>
                                 </div>
                                 <div className="flex gap-3">
-                                    <WalletDepositModal onSuccess={fetchWalletData} />
+                                    <WalletDepositModal onSuccess={refreshAllData} />
                                     <Button
                                         variant="outline"
-                                        onClick={fetchWalletData}
-                                        disabled={walletLoading}
+                                        onClick={refreshAllData}
+                                        disabled={loading || walletLoading}
                                         className="gap-2 text-white border-white/20 hover:bg-white/10"
                                     >
-                                        <RefreshCw className={`h-4 w-4 ${walletLoading ? "animate-spin" : ""}`} />
+                                        <RefreshCw className={`h-4 w-4 ${(loading || walletLoading) ? "animate-spin" : ""}`} />
                                         Refresh
                                     </Button>
                                     <Button
@@ -345,7 +400,7 @@ export default function ProfilePage() {
                                             {transactions
                                                 .filter((tx) => tx.type === "DEPOSIT")
                                                 .reduce((sum, tx) => sum + parseFloat(tx.amount), 0)
-                                                .toFixed(2)}
+                                                .toFixed(4)}
                                         </p>
                                     </div>
                                     <TrendingUp className="h-8 w-8 text-white" />
@@ -363,7 +418,7 @@ export default function ProfilePage() {
                                             {transactions
                                                 .filter((tx) => tx.type === "STAKE")
                                                 .reduce((sum, tx) => sum + parseFloat(tx.amount), 0)
-                                                .toFixed(2)}
+                                                .toFixed(4)}
                                         </p>
                                     </div>
                                     <TrendingDown className="h-8 w-8 text-white" />
@@ -377,7 +432,7 @@ export default function ProfilePage() {
                                     <div>
                                         <p className="text-sm text-green-200/70 mb-1">Creator Earnings</p>
                                         <p className="text-2xl font-bold text-green-100">
-                                            ${userData?.stats.creatorEarnings.toFixed(2) || "0.00"}
+                                            ${userData?.stats.creatorEarnings.toFixed(4) || "0.0000"}
                                         </p>
                                         <p className="text-xs text-green-200/50 mt-1">
                                             From {userData?.stats.totalVideos || 0} videos • {userData?.stats.totalViews || 0} views
@@ -388,6 +443,11 @@ export default function ProfilePage() {
                             </CardContent>
                         </Card>
                     </div>
+                </div>
+
+                {/* Creator Withdrawals Section - Always show for creators */}
+                <div className="mb-6">
+                    <CreatorWithdrawals />
                 </div>
 
                 {/* Transaction History */}

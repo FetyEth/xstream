@@ -22,16 +22,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use transaction to ensure atomicity
+    // Use transaction to ensure atomicity with increased timeout
     const result = await prisma.$transaction(async (tx) => {
-      // Get current balances
-      const fromUser = await tx.user.findUnique({
-        where: { walletAddress: fromWalletAddress },
-      });
-
-      const toUser = await tx.user.findUnique({
-        where: { walletAddress: toWalletAddress },
-      });
+      // Get current balances in parallel for better performance
+      const [fromUser, toUser] = await Promise.all([
+        tx.user.findUnique({
+          where: { walletAddress: fromWalletAddress },
+        }),
+        tx.user.findUnique({
+          where: { walletAddress: toWalletAddress },
+        }),
+      ]);
 
       if (!fromUser || !toUser) {
         throw new Error('User not found');
@@ -45,30 +46,29 @@ export async function POST(request: NextRequest) {
         throw new Error('Insufficient balance');
       }
 
-      // Update balances
-      const updatedFromUser = await tx.user.update({
-        where: { walletAddress: fromWalletAddress },
-        data: {
-          walletBalance: currentFromBalance - amount,
-        },
-      });
-
-      const updatedToUser = await tx.user.update({
-        where: { walletAddress: toWalletAddress },
-        data: {
-          walletBalance: currentToBalance + amount,
-        },
-      });
-
-      // Update video earnings (this field exists in your schema)
-      await tx.video.update({
-        where: { id: videoId },
-        data: {
-          totalEarnings: {
-            increment: amount,
+      // Update balances and video earnings in parallel for better performance
+      const [updatedFromUser, updatedToUser] = await Promise.all([
+        tx.user.update({
+          where: { walletAddress: fromWalletAddress },
+          data: {
+            walletBalance: currentFromBalance - amount,
           },
-        },
-      });
+        }),
+        tx.user.update({
+          where: { walletAddress: toWalletAddress },
+          data: {
+            walletBalance: currentToBalance + amount,
+          },
+        }),
+        tx.video.update({
+          where: { id: videoId },
+          data: {
+            totalEarnings: {
+              increment: amount,
+            },
+          },
+        }),
+      ]);
 
       return {
         transactionId: `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -76,9 +76,19 @@ export async function POST(request: NextRequest) {
         toBalance: parseFloat(updatedToUser.walletBalance.toString()),
         amount,
       };
+    }, {
+      maxWait: 10000, // Maximum time to wait for a transaction slot (10s)
+      timeout: 15000, // Maximum time for the transaction to complete (15s)
     });
 
-    console.log('✅ Wallet transfer completed:', result);
+    console.log('✅ Wallet transfer completed:', {
+      from: fromWalletAddress,
+      to: toWalletAddress,
+      amount,
+      videoId,
+      newFromBalance: result.fromBalance,
+      newToBalance: result.toBalance,
+    });
 
     return NextResponse.json({
       success: true,

@@ -21,6 +21,9 @@ export async function depositToWallet(
   walletAddress: string
 ): Promise<{ success: boolean; error?: string; balance?: string }> {
   try {
+    // Normalize wallet address to lowercase for consistency
+    const normalizedAddress = walletAddress.toLowerCase();
+    
     // Payment requirements for deposit
     const paymentRequirements: PaymentRequirements = {
       scheme: "exact",
@@ -55,14 +58,14 @@ export async function depositToWallet(
 
     // Get user
     let user = await prisma.user.findUnique({
-      where: { walletAddress },
+      where: { walletAddress: normalizedAddress },
     });
 
 
     // Ensure user has walletBalance field (for existing users created before wallet feature)
     if (user?.walletBalance === null || user?.walletBalance === undefined) {
       user = await prisma.user.update({
-        where: { walletAddress },
+        where: { walletAddress: normalizedAddress },
         data: {
           walletBalance: 0,
         },
@@ -77,7 +80,7 @@ export async function depositToWallet(
     // Update user balance and create transaction record
     const [updatedUser] = await prisma.$transaction([
       prisma.user.update({
-        where: { walletAddress },
+        where: { walletAddress: normalizedAddress },
         data: {
           walletBalance: balanceAfter,
         },
@@ -115,8 +118,11 @@ export async function getWalletBalance(
   walletAddress: string
 ): Promise<{ success: boolean; balance?: string; transactions?: any[]; error?: string }> {
   try {
+    // Normalize wallet address to lowercase for consistency
+    const normalizedAddress = walletAddress.toLowerCase();
+    
     const user = await prisma.user.findUnique({
-      where: { walletAddress },
+      where: { walletAddress: normalizedAddress },
       include: {
         walletTransactions: {
           orderBy: { createdAt: "desc" },
