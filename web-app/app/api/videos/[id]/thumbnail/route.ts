@@ -21,6 +21,11 @@ export async function GET(
       );
     }
 
+    // If it's an external URL (like Unsplash), redirect directly
+    if (video.thumbnailUrl.startsWith('http://') || video.thumbnailUrl.startsWith('https://')) {
+      return NextResponse.redirect(video.thumbnailUrl);
+    }
+
     let key: string;
     
     // Extract S3 key from URL
