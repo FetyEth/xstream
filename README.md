@@ -11,7 +11,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-5.0-2D3748?style=flat-square&logo=prisma)](https://www.prisma.io/)
 
-[Demo Video](#) • [Live Demo](https://xstream.fildos.cloud/) • [GitHub](https://github.com/imApoorva36/xstream)
+[Demo Video](https://www.youtube.com/watch?v=VDGrd6wK83o) • [Live Demo](https://xstream.fildos.cloud/) • [GitHub](https://github.com/imApoorva36/xstream)
 
 </div>
 
@@ -326,15 +326,76 @@ npx tsx scripts/migrate-settlements.ts
 
 ---
 
+## 🔮 Future Enhancements
+
+### Quality-Based Pricing Algorithm
+
+**Adaptive Bitrate Charging Model:**
+
+Creators set a base price per second for the highest quality (e.g., 1080p @ $0.01/sec). Lower qualities are automatically priced proportionally:
+
+**Example:** 10-minute video at $0.01/sec for 1080p
+
+- **1080p**: 600 sec × $0.01 = **$6.00**
+- **720p**: 600 sec × (720/1080) × $0.01 = **$4.00**
+- **480p**: 600 sec × (480/1080) × $0.01 = **$2.67**
+- **240p**: 600 sec × (240/1080) × $0.01 = **$1.33**
+- **144p**: 600 sec × (144/1080) × $0.01 = **$0.80**
+
+**Adaptive Streaming Cost Example (1 minute watch):**
+
+| Time Range | Quality | Cost Calculation | Segment Cost |
+| ---------- | ------- | ---------------- | ------------ |
+| 0-15 sec   | 1080p   | 15 × $0.01       | $0.15        |
+| 15-45 sec  | 480p    | 30 × $0.00444    | $0.13        |
+| 45-60 sec  | 720p    | 15 × $0.00667    | $0.10        |
+| **Total**  |         |                  | **$0.38**    |
+
+User is staked $6.00 (max cost), watches for $0.38, receives $5.62 refund automatically.
+
+---
+
+### NFT Milestone Rewards
+
+**Viewer NFTs:**
+
+- 🎥 **Watch Time Milestones**: 10 mins, 50 mins, 100 mins, 500 mins, 1000 mins...
+- 💰 **Spending Milestones**: $1, $3, $5, $10, $30, $50, $100...
+- 📺 **Videos Watched**: 1, 3, 5, 10, 30, 50, 100 videos...
+
+**Creator NFTs:**
+
+- 🎬 **Upload Time Milestones**: 10 mins, 50 mins, 100 mins, 500 mins uploaded...
+- 💵 **Earnings Milestones**: $1, $3, $5, $10, $30, $50, $100 earned...
+- 📤 **Videos Uploaded**: 1, 3, 5, 10, 30, 50, 100 videos uploaded...
+
+Each NFT minted on Base as a soulbound token, representing user achievements and platform loyalty.
+
+---
+
+### Ad Integration (Future)
+
+**Fair Ad Distribution:**
+
+- Platform evenly picks ads from available ad pool
+- Ads shown before/during video playback
+- Track ad engagement metrics:
+  - Number of ads skipped
+  - Number of ads fully watched
+  - Click-through rates
+- Revenue split between creator, platform, and viewer (watch-to-earn)
+
+---
+
 ## 👥 Team
 
 Built with passion by:
 
-- **Apoorva Verma**
-- **Ayush Tiwari**
-- **Kaustubh Dwivedi**
-- **Saksham Bindal**
-- **Yuvraj Singh**
+- **Apoorva Agrawal**
+- **Fahim Ahmed**
+- **Vedant Tarale**
+- **Abhishek Satpathy**
+- **Chinmaya Sahu**
 
 ---
 
@@ -354,6 +415,8 @@ Built with passion by:
 **Built with ❤️ for Base Batches Builder Track 2025**
 
 **Live Demo:** [xstream.fildos.cloud](https://xstream.fildos.cloud/)
+
+**Demo Video:** [Watch on YouTube](https://www.youtube.com/watch?v=VDGrd6wK83o)
 
 **GitHub:** [github.com/imApoorva36/xstream](https://github.com/imApoorva36/xstream)
 
