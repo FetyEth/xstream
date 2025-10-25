@@ -51,7 +51,10 @@ xStream is a **decentralized video streaming platform** that revolutionizes cont
 
 <!-- Add your architecture diagram image here -->
 
-![Architecture Diagram](./docs/architecture-diagram.png)
+<img width="948" height="526" alt="xstream drawio" src="https://github.com/user-attachments/assets/3bf70506-16f9-4466-a004-591f76c24897" />
+
+
+
 
 ---
 
