@@ -1,168 +1,362 @@
-# 🎥 xStream — Pay-Per-Second Video Monetization Platform
+# xStream - Decentralized Video Streaming Platform
 
-> **Revolutionary Web3 streaming platform enabling precise pay-per-second video monetization.**
+<div align="center">
 
-xStream transforms video monetization by introducing real-time, usage-based payments. Viewers pay only for the exact seconds they watch, while creators receive instant compensation with unprecedented precision.
+![xStream Logo](https://img.shields.io/badge/xStream-Stream.Build.Earn-blueviolet?style=for-the-badge)
 
-## The Problem
+**Pay-per-second video streaming on Base • Up to 100% creator revenue • Instant blockchain settlements**
 
-The creator economy is broken. Traditional streaming platforms extract **30–55% of creator revenue**, while viewers are trapped in expensive subscriptions they barely use.
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Base](https://img.shields.io/badge/Base-Sepolia-0052FF?style=flat-square&logo=coinbase)](https://base.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-5.0-2D3748?style=flat-square&logo=prisma)](https://www.prisma.io/)
 
-- **Platform Monopoly** – YouTube and Netflix take massive cuts from creators
-- **Unfair Pricing** – Users pay monthly fees but watch sporadically
-- **Delayed Payments** – Creators wait 30–90 days for earnings
-- **Opaque Analytics** – Black-box algorithms control creator visibility
+[Demo Video](#) • [Live Demo](https://xstream.fildos.cloud/) • [GitHub](https://github.com/imApoorva36/xstream)
 
-### Market Opportunity
+</div>
 
-- **Creator Economy:** $104B market growing 20% annually
-- **Micropayments:** $2.3T untapped potential for granular digital payments
-- **Web3 Adoption:** 420M+ crypto users seeking real-world utility
+---
 
-## Our Solution
+## 🎯 Overview
 
-### Pay-Per-Second Precision
+xStream is a **decentralized video streaming platform** that revolutionizes content monetization through **precise per-second payments**. Built on Base blockchain, it enables creators to earn **up to 100% of revenue** with **instant on-chain settlements** powered by Coinbase CDP AgentKit.
 
-- Sub-second billing accuracy with quality-tiered pricing
-- 60% average cost savings for viewers vs. subscriptions
+### 🌟 Key Features
 
-### Creator-First Economics
+- **⚡ Pay-Per-Second Streaming** - Viewers pay only for seconds watched, nothing wasted
+- **💯 Up to 100% Creator Revenue** - Zero platform fees, earnings go directly to creators
+- **🚀 Instant Settlements** - Automated blockchain payouts via CDP AgentKit MPC wallet
+- **🔄 Automatic Refunds** - Unused video time automatically credited back to viewers
+- **💳 Gasless Payments** - x402 protocol for frictionless USDC deposits
+- **🎨 Adaptive Streaming** - HLS with multiple quality levels (1080p/720p/480p)
+- **🔗 Base Blockchain** - Fast, cheap transactions on Ethereum L2
 
-- **95% revenue share** (vs. YouTube's 55%)
-- **Instant crypto settlements** — no more 30-90 day delays
-- **Transparent earnings** with real-time blockchain verification
+---
 
-### Frictionless Experience
+## 🏗️ Architecture
 
-- Stake-before-watch system with automatic refunds
-- One-click ad skipping via micropayments
-- NFT achievement rewards for engagement milestones
+### Tech Stack
 
-### Web3-Native Infrastructure
+| Layer          | Technology                                    |
+| -------------- | --------------------------------------------- |
+| **Frontend**   | Next.js 15, React 19, TypeScript, TailwindCSS |
+| **Backend**    | Next.js API Routes, Prisma ORM                |
+| **Database**   | PostgreSQL (Prisma Accelerate)                |
+| **Blockchain** | Base Sepolia, OnchainKit, RainbowKit          |
+| **Payments**   | x402 Protocol (USDC), CDP AgentKit            |
+| **Video**      | FFmpeg, HLS/DASH, AWS S3                      |
+| **Auth**       | Wallet-based (MetaMask, Coinbase Wallet)      |
 
-- Built on **Base (Coinbase L2)** for low-cost, high-speed transactions
-- **OnchainKit** wallet integration for seamless onboarding
-- Smart-contract automation ensures trustless distribution
+### System Architecture Diagram
 
-## Technology Stack
+<!-- Add your architecture diagram image here -->
 
-| Layer      | Technology                 |
-| ---------- | -------------------------- |
-| Frontend   | Next.js, React, TypeScript |
-| UI         | shadcn/ui, Tailwind CSS    |
-| Blockchain | Base (Coinbase L2)         |
-| Database   | PostgreSQL, Prisma ORM     |
-| Storage    | AWS S3                     |
-| Wallet     | OnchainKit (Coinbase)      |
+![Architecture Diagram](./docs/architecture-diagram.png)
 
-## Smart Contract Architecture
+---
 
-### XStreamCore
+## 🚀 Getting Started
 
-**Purpose:** Minimal payment engine for Web3 operations
+### Prerequisites
 
-**Features:**
+- Node.js 18+ and npm/yarn
+- PostgreSQL database
+- Coinbase Developer Platform account
+- Base Sepolia testnet wallet
 
-- Stake management for viewers
-- Pay-per-second billing with 5% platform fee
-- Instant creator earnings withdrawal
-- NFT achievement integration
-
-### XStreamNFT
-
-**Purpose:** Achievement rewards system
-
-**Features:**
-
-- ERC-721 compliant NFTs for milestones
-- Categories: Watch time, spending, creator rewards
-- IPFS metadata storage
-- Backend-triggered minting
-
-### XStreamAds
-
-**Purpose:** Advertisement monetization
-
-**Features:**
-
-- Advertiser budget management
-- User rewards for ad viewing (10% platform fee)
-- Campaign integration with backend analytics
-
-### XStreamFactory
-
-**Purpose:** One-transaction ecosystem deployment
-
-**Features:**
-
-- Atomic deployment of all contracts
-- Central address registry
-- Automated contract interconnection
-
-## Platform Features
-
-- **Homepage** — Content discovery and trending videos
-- **Video Player** — Adaptive streaming with quality selection
-- **Pay-Per-Second Billing** — Stake-based viewing with automatic refunds
-- **Creator Dashboard** — Upload workflow and analytics
-- **Achievement System** — NFT rewards for engagement milestones
-- **Ad Management** — Campaign creation and targeting
-
-## Getting Started
+### Installation
 
 ```bash
-# Clone repository
-git clone <repository-url>
+# Clone the repository
+git clone https://github.com/imApoorva36/xstream.git
 cd xstream/web-app
 
 # Install dependencies
 npm install
 
-# Configure environment
+# Set up environment variables
 cp .env.example .env.local
+```
 
-# Setup database
-npm run db:push
-npm run db:seed
+### Environment Variables
 
-# Start development server
+Create `.env.local` with the following:
+
+```bash
+# Database (Prisma Accelerate URL)
+DATABASE_URL="prisma+postgres://accelerate.prisma-data.net/?api_key=YOUR_KEY"
+
+# Coinbase Developer Platform
+CDP_API_KEY_NAME="organizations/{org_id}/apiKeys/{key_id}"
+CDP_API_KEY_PRIVATE_KEY="-----BEGIN EC PRIVATE KEY-----\n...\n-----END EC PRIVATE KEY-----\n"
+CDP_WALLET_SECRET="your-wallet-secret"
+NETWORK_ID="base-sepolia"
+
+# OnchainKit
+NEXT_PUBLIC_ONCHAINKIT_API_KEY="your-onchainkit-api-key"
+
+# AWS S3 (for video storage)
+AWS_ACCESS_KEY_ID="your-aws-key"
+AWS_SECRET_ACCESS_KEY="your-aws-secret"
+AWS_REGION="us-east-1"
+AWS_S3_BUCKET="xstream-videos"
+```
+
+### Database Setup
+
+```bash
+# Generate Prisma client
+npx prisma generate
+
+# Push schema to database
+npx prisma db push
+
+# Seed demo data
+npx tsx scripts/seed-platform.ts
+```
+
+### Run Development Server
+
+```bash
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to explore xStream.
-
-## Architecture Benefits
-
-| Component      | Handled By | Benefits                             |
-| -------------- | ---------- | ------------------------------------ |
-| Video Metadata | Database   | Fast queries, unlimited storage      |
-| User Profiles  | Database   | Real-time updates, complex filtering |
-| Analytics      | Database   | Instant insights, data aggregation   |
-| Payments       | Blockchain | Trustless, transparent, immutable    |
-| Earnings       | Blockchain | Direct creator payouts               |
-| NFT Rewards    | Blockchain | Provable ownership, tradeable        |
-
-## Founding Team
-
-- **Apoorva Agrawal** — Co-Founder
-- **Abhishek Satpathy** — Co-Founder
-- **Fahim Ahmed** — Co-Founder
-- **Chinmaya Sahu** — Co-Founder
-- **Vedant Tarale** — Co-Founder
-
-## Why Now?
-
-- **Perfect Storm:** Creator-economy crisis meets Web3 readiness
-- **Regulatory Clarity:** Base/Coinbase provide compliant infrastructure
-- **Market Timing:** 420M+ crypto users seeking real utility
-- **Technical Readiness:** Layer 2 solutions make micropayments viable
+Visit `http://localhost:3000` or the live demo at [https://xstream.fildos.cloud/](https://xstream.fildos.cloud/) 🎉
 
 ---
 
-**xStream** — Building the financial infrastructure for content creators worldwide.
+## 📖 Core Features
 
-_Deploy. Stream. Earn._
+### 1. **Per-Second Video Charging**
 
-📧 [founders@xstream.com](mailto:founders@xstream.com)  
-💬 [Join our Discord](https://discord.gg/xstream)  
-🐦 [Follow us on Twitter](https://twitter.com/xstream_tv)
+```typescript
+// Real-time charging every second
+setInterval(() => {
+  const secondsWatched = videoElement.currentTime - startTime;
+  const cost = pricePerSecond * secondsWatched;
+
+  // Update viewer balance
+  await updateBalance(viewerId, -cost);
+
+  // Credit creator earnings
+  await updateEarnings(creatorId, cost);
+}, 1000);
+```
+
+**Features:**
+
+- Automatic staking of full video cost upfront
+- Real-time balance deduction every second
+- Instant refund of unwatched portions on pause/exit
+- Sub-cent precision with 6 decimal USDC
+
+### 2. **Instant Creator Settlements**
+
+```typescript
+// Automated settlement via CDP AgentKit
+const txHash = await settlementAgent.sendSettlement(
+  creatorWallet,
+  availableEarnings
+);
+
+// On-chain USDC transfer in 5-30 seconds
+// Verifiable on BaseScan
+```
+
+**Settlement Flow:**
+
+1. Creator requests withdrawal (any amount, no minimum temporarily)
+2. System validates available earnings
+3. CDP MPC wallet executes USDC transfer
+4. Transaction hash returned immediately
+5. Settlement marked complete in database
+
+### 3. **x402 Gasless Deposits**
+
+Viewers deposit USDC without paying gas fees using x402 protocol:
+
+- Sign EIP-712 message (no gas)
+- Platform verifies signature
+- USDC transferred via permit
+- Internal balance updated
+
+### 4. **Adaptive Video Streaming**
+
+FFmpeg transcodes uploaded videos into:
+
+- **1080p** (5000 kbps) - Premium quality
+- **720p** (2500 kbps) - Standard quality
+- **480p** (1000 kbps) - Mobile quality
+
+HLS manifest allows seamless quality switching based on bandwidth.
+
+---
+
+## 💰 Revenue Model
+
+| Stakeholder  | Share          | Notes                                              |
+| ------------ | -------------- | -------------------------------------------------- |
+| **Creator**  | Up to 100%     | Earnings go directly to content creator            |
+| **Platform** | 0%             | No fees (future: optional 5% for premium features) |
+| **Viewer**   | Pay-per-second | $0.01 - $0.15/second based on content              |
+
+**Example Earnings:**
+
+- 10-minute tutorial @ $0.08/second
+- 10,000 views with 70% avg watch rate
+- Earnings: `600 seconds × $0.08 × 10,000 × 0.7 = $336,000`
+
+---
+
+## 🗄️ Database Schema
+
+```prisma
+model User {
+  id            String   @id @default(cuid())
+  walletAddress String   @unique
+  walletBalance Decimal  @default(0)
+  username      String?
+  displayName   String?
+  profileImage  String?
+  videos        Video[]
+  viewSessions  ViewSession[]
+  settlements   Settlement[]
+}
+
+model Video {
+  id              String   @id @default(cuid())
+  creatorWallet   String
+  title           String
+  description     String?
+  duration        Int      // seconds
+  pricePerSecond  Decimal
+  totalViews      Int      @default(0)
+  totalWatchTime  Int      @default(0)
+  totalEarnings   Decimal  @default(0)
+  videoUrl        String
+  thumbnailUrl    String?
+  category        String?
+  creator         User     @relation(fields: [creatorWallet], references: [walletAddress])
+}
+
+model Settlement {
+  id           String   @id @default(cuid())
+  creatorId    String
+  amount       Decimal
+  status       String   // PENDING | PROCESSING | COMPLETED | FAILED
+  txHash       String?  // Blockchain transaction hash
+  requestedAt  DateTime @default(now())
+  completedAt  DateTime?
+  creator      User     @relation(fields: [creatorId], references: [id])
+}
+```
+
+---
+
+## 🎬 Demo Data
+
+Seeded platform includes:
+
+- **6 creators** with realistic profiles
+- **20 videos** across 5 categories (Technology, Education, Creator Economy, Tutorials, Community)
+- **545K+ views** with realistic engagement metrics
+- **$15M+ in earnings** demonstrating pricing diversity ($0.01 - $0.15/sec)
+- **Professional thumbnails** from Unsplash
+- **Sample videos** from Google's test bucket
+
+---
+
+## 🔧 Scripts
+
+```bash
+# Seed demo data
+npx tsx scripts/seed-platform.ts
+
+# Test settlement agent
+npx tsx scripts/test-settlement-agent.ts
+
+# Test real blockchain payout
+npx tsx scripts/test-real-payout.ts
+
+# Database migration
+npx tsx scripts/migrate-settlements.ts
+```
+
+---
+
+## 🧪 Testing
+
+### Manual Test Flow
+
+1. **Connect Wallet** → RainbowKit modal with MetaMask/Coinbase Wallet
+2. **Deposit USDC** → x402 gasless deposit via `/api/wallet/deposit`
+3. **Browse Videos** → Filter by category, search, sort
+4. **Watch Video** → Authorize payment, real-time charging
+5. **Check Balance** → Profile page shows deposits, spent, earnings
+6. **Request Withdrawal** → Instant settlement via CDP AgentKit
+7. **Verify on BaseScan** → Check transaction hash on Base Sepolia
+
+---
+
+## 🚧 Roadmap
+
+### Phase 1 - MVP (Current)
+
+- [x] Per-second video charging
+- [x] CDP AgentKit settlements
+- [x] x402 gasless deposits
+- [x] Adaptive HLS streaming
+- [x] Creator analytics
+
+### Phase 2 - Growth
+
+- [ ] Mainnet deployment (Base)
+- [ ] NFT rewards for watch milestones
+- [ ] Multi-creator revenue splits
+- [ ] Live streaming support
+- [ ] Mobile app (React Native)
+
+### Phase 3 - Scale
+
+- [ ] Decentralized storage (IPFS/Arweave)
+- [ ] Cross-chain support
+- [ ] Creator DAOs
+- [ ] Subscription bundles
+- [ ] Ad-free premium tier
+
+---
+
+## 👥 Team
+
+Built with passion by:
+
+- **Apoorva Verma**
+- **Ayush Tiwari**
+- **Kaustubh Dwivedi**
+- **Saksham Bindal**
+- **Yuvraj Singh**
+
+---
+
+## 🙏 Acknowledgments
+
+- **Base** - Fast, cheap Ethereum L2
+- **Coinbase Developer Platform** - CDP AgentKit for settlements
+- **OnchainKit** - Wallet integration and Base utilities
+- **Prisma** - Type-safe database ORM
+- **RainbowKit** - Beautiful wallet connection UI
+- **x402 Protocol** - Gasless USDC payments
+
+---
+
+<div align="center">
+
+**Built with ❤️ for Base Batches Builder Track 2025**
+
+**Live Demo:** [xstream.fildos.cloud](https://xstream.fildos.cloud/)
+
+**GitHub:** [github.com/imApoorva36/xstream](https://github.com/imApoorva36/xstream)
+
+[⬆ Back to Top](#xstream---decentralized-video-streaming-platform)
+
+</div>
