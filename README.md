@@ -1,4 +1,4 @@
-# xStream - Decentralized Video Streaming Platform
+# Stream - Decentralized Video Streaming Platform
 
 <div align="center">
 
